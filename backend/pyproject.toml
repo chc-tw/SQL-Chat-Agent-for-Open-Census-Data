@@ -1,0 +1,20 @@
+[project]
+name = "backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic[aiohttp]>=0.84.0",
+    "load-dotenv>=0.1.0",
+    "pydantic-settings>=2.13.1",
+    "python-frontmatter>=1.1.0",
+    "snowflake-connector-python[pandas]>=4.3.0",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.2.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
