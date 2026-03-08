@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatMessage, ThinkingStep } from "../../types/ui";
@@ -14,6 +14,14 @@ const TOOL_LABELS: Record<string, string> = {
 function StepRow({ step }: { step: ThinkingStep }) {
   // Active steps (not complete) auto-expand; completed steps start collapsed
   const [expanded, setExpanded] = useState(!step.isComplete);
+
+  // Auto-collapse when streaming completes
+  useEffect(() => {
+    if (step.isComplete) {
+      setExpanded(false);
+    }
+  }, [step.isComplete]);
+
   const label = step.toolName
     ? (TOOL_LABELS[step.toolName] ?? step.toolName)
     : "Thinking...";
