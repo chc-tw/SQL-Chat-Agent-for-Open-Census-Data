@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, AsyncGenerator, TypedDict
@@ -77,7 +76,7 @@ async def run_agent(
 
     for iteration in range(max_iterations):
         yield {"event": "step_start", "data": {"iteration": iteration}}
-        current_trace_iter = TraceIteration(iteration=iteration, thinking="")
+        current_trace_iter = TraceIteration(iteration=iteration)
         # Stream the response
         collected_text = ""
         tool_uses: list[dict[str, Any]] = []
@@ -156,7 +155,7 @@ async def run_agent(
 
                 yield {"event": "tool_result", "data": {"name": tu["name"], "result": result}}
                 current_trace_iter["tool_result"] = result
-                trace_iterations.append(current_trace_iter)
+                trace_iterations.append(dict(current_trace_iter))
 
                 tool_results.append({
                     "type": "tool_result",
@@ -191,4 +190,4 @@ async def run_agent(
         trace_file = traces_dir / f"{session_id}_{message_id}.json"
         trace_file.write_text(trace_json, encoding="utf-8")
 
-    yield {"event": "trace", "data": trace_json}
+    yield {"event": "trace", "data": trace}
