@@ -17,6 +17,7 @@ async def run_agent(
     user_message: str,
     chat_history: list[dict[str, Any]] | None = None,
     max_iterations: int = MAX_ITERATIONS,
+    # session_id and message_id are used for trace collection (populated in Task 2)
     session_id: str | None = None,
     message_id: str | None = None,
 ) -> AsyncGenerator[dict[str, Any], None]:
@@ -24,7 +25,8 @@ async def run_agent(
     Run the ReAct agent loop with streaming.
 
     Yields SSE-compatible event dicts:
-        {"event": "text_delta", "data": "<text chunk>"}
+        {"event": "step_start", "data": {"iteration": <int>}}
+        {"event": "thinking_delta", "data": "<text chunk>"}
         {"event": "tool_use", "data": {"name": "...", "input": {...}}}
         {"event": "tool_result", "data": {"name": "...", "result": "..."}}
         {"event": "done", "data": "<full response text>"}
@@ -33,7 +35,7 @@ async def run_agent(
     # Guardrails check
     is_safe, rejection = check_guardrails(user_message)
     if not is_safe:
-        yield {"event": "thinking_delta", "data": rejection}
+        yield {"event": "error", "data": rejection}
         yield {"event": "done", "data": rejection}
         return
 
@@ -91,11 +93,13 @@ async def run_agent(
             if stop_reason != "tool_use":  # Only final answer goes into full_response
                 full_response += collected_text
 
+        parsed_inputs: dict[str, dict[str, Any]] = {}
         for tu in tool_uses:
             try:
                 tool_input = json.loads(tu["input_json"]) if tu["input_json"] else {}
             except json.JSONDecodeError:
                 tool_input = {}
+            parsed_inputs[tu["id"]] = tool_input
             content_blocks.append({
                 "type": "tool_use",
                 "id": tu["id"],
@@ -109,10 +113,7 @@ async def run_agent(
         if stop_reason == "tool_use" and tool_uses:
             tool_results: list[dict[str, Any]] = []
             for tu in tool_uses:
-                try:
-                    tool_input = json.loads(tu["input_json"]) if tu["input_json"] else {}
-                except json.JSONDecodeError:
-                    tool_input = {}
+                tool_input = parsed_inputs[tu["id"]]
 
                 yield {"event": "tool_use", "data": {"name": tu["name"], "input": tool_input}}
 
