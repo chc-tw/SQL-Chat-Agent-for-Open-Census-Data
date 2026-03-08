@@ -77,6 +77,7 @@ async def send_message(
         ):
             if event["event"] == "done":
                 full_response = event["data"]
+            # "trace" is always emitted after "done" by run_agent (see runner.py)
             elif event["event"] == "trace":
                 # Save assistant message with trace attached
                 trace_str = json.dumps(event["data"]) if not isinstance(event["data"], str) else event["data"]
