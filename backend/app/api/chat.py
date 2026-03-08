@@ -79,8 +79,8 @@ async def send_message(
                 full_response = event["data"]
             # "trace" is always emitted after "done" by run_agent (see runner.py)
             elif event["event"] == "trace":
-                # Save assistant message with trace attached
-                trace_str = json.dumps(event["data"]) if not isinstance(event["data"], str) else event["data"]
+                # event["data"] is already a JSON string (trace_json from runner)
+                trace_str = event["data"] if isinstance(event["data"], str) else json.dumps(event["data"])
                 await fs.add_message(
                     user.username, session_id, "assistant", full_response,
                     trace=trace_str,
@@ -89,7 +89,8 @@ async def send_message(
 
             yield {
                 "event": event["event"],
-                "data": json.dumps(event["data"]) if not isinstance(event["data"], str) else event["data"],
+                # Always JSON-encode so multi-line strings stay on one SSE data line
+                "data": json.dumps(event["data"]),
             }
 
         # Fallback: save without trace if trace event never fired

@@ -84,7 +84,28 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
             {/* Final answer */}
             <div className="prose prose-sm max-w-none">
-              <Markdown remarkPlugins={[remarkGfm]}>
+              <Markdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  table: ({ children }) => (
+                    <div className="overflow-x-auto my-2">
+                      <table className="min-w-full border-collapse text-sm">{children}</table>
+                    </div>
+                  ),
+                  thead: ({ children }) => <thead className="bg-gray-50">{children}</thead>,
+                  th: ({ children }) => (
+                    <th className="border border-gray-300 px-3 py-2 text-left font-semibold text-gray-700">
+                      {children}
+                    </th>
+                  ),
+                  td: ({ children }) => (
+                    <td className="border border-gray-300 px-3 py-2 text-gray-800">{children}</td>
+                  ),
+                  tr: ({ children }) => (
+                    <tr className="even:bg-gray-50">{children}</tr>
+                  ),
+                }}
+              >
                 {message.content ||
                   (message.steps && message.steps.length > 0 ? "" : "Thinking...")}
               </Markdown>

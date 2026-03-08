@@ -64,9 +64,10 @@ export function useChat(sessionId: string | null) {
                 break;
               }
               case "thinking_delta": {
+                const chunk = JSON.parse(event.data) as string;
                 if (currentSteps.length > 0) {
                   const last = currentSteps[currentSteps.length - 1]!;
-                  currentSteps[currentSteps.length - 1] = { ...last, thinking: last.thinking + event.data };
+                  currentSteps[currentSteps.length - 1] = { ...last, thinking: last.thinking + chunk };
                 }
                 setMessages((prev) => {
                   const updated = [...prev];
@@ -124,6 +125,7 @@ export function useChat(sessionId: string | null) {
                 break;
               }
               case "done": {
+                const finalContent = JSON.parse(event.data) as string;
                 // Keep only steps that called a tool — the final iteration's
                 // "thinking" text is the answer itself, not a reasoning step.
                 const toolSteps = currentSteps
@@ -137,7 +139,7 @@ export function useChat(sessionId: string | null) {
                   if (last) {
                     updated[updated.length - 1] = {
                       ...last,
-                      content: event.data,
+                      content: finalContent,
                       steps: [...currentSteps],
                     };
                   }
@@ -160,13 +162,14 @@ export function useChat(sessionId: string | null) {
                 break;
               }
               case "error": {
+                const errMsg = JSON.parse(event.data) as string;
                 setMessages((prev) => {
                   const updated = [...prev];
                   const last = updated[updated.length - 1];
                   if (last) {
                     updated[updated.length - 1] = {
                       ...last,
-                      content: last.content + `\n\n**Error:** ${event.data}`,
+                      content: last.content + `\n\n**Error:** ${errMsg}`,
                     };
                   }
                   return updated;
