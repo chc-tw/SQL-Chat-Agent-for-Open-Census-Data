@@ -31,7 +31,7 @@ class TraceData(TypedDict):
     final_response: str
 
 
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-sonnet-4-6"
 MAX_ITERATIONS = 10
 
 
@@ -54,8 +54,8 @@ async def run_agent(
         {"event": "done", "data": "<full response text>"}
         {"event": "error", "data": "<error message>"}
     """
-    # Guardrails check
-    is_safe, rejection = check_guardrails(user_message)
+    # Guardrails check (async LLM-based)
+    is_safe, rejection = await check_guardrails(user_message)
     if not is_safe:
         yield {"event": "error", "data": rejection}
         yield {"event": "done", "data": rejection}
@@ -172,6 +172,18 @@ async def run_agent(
         # end_turn or max_tokens — we're done
         trace_iterations.append(current_trace_iter)
         break
+
+    # If the loop exhausted max_iterations without a final answer, build an informative message
+    if not full_response and trace_iterations:
+        tools_used = [t.get("tool", "unknown") for t in trace_iterations if t.get("tool")]
+        steps_summary = ", ".join(dict.fromkeys(tools_used)) or "various tools"
+        full_response = (
+            f"I was unable to produce a complete answer within the allowed number of steps. "
+            f"Here is what I attempted:\n\n"
+            f"I tried using: {steps_summary}.\n\n"
+            f"The query may be too complex or the data may require a different approach. "
+            f"Please try rephrasing your question or breaking it into smaller parts."
+        )
 
     yield {"event": "done", "data": full_response}
 

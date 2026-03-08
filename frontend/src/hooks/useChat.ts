@@ -124,10 +124,13 @@ export function useChat(sessionId: string | null) {
                 break;
               }
               case "done": {
-                // Mark all steps complete, set final content
-                const completedSteps = currentSteps.map((s) => ({ ...s, isComplete: true }));
+                // Keep only steps that called a tool — the final iteration's
+                // "thinking" text is the answer itself, not a reasoning step.
+                const toolSteps = currentSteps
+                  .filter((s) => s.toolName !== undefined)
+                  .map((s) => ({ ...s, isComplete: true }));
                 currentSteps.length = 0;
-                completedSteps.forEach((s) => currentSteps.push(s));
+                toolSteps.forEach((s) => currentSteps.push(s));
                 setMessages((prev) => {
                   const updated = [...prev];
                   const last = updated[updated.length - 1];
