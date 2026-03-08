@@ -34,6 +34,6 @@ export interface MessageResponse {
 }
 
 export interface SSEEvent {
-  event: "step_start" | "thinking_delta" | "tool_use" | "tool_result" | "done" | "trace" | "error";
+  event: "step_start" | "thinking_delta" | "tool_use" | "tool_result" | "done" | "trace" | "error" | "session_rename";
   data: string;
 }
