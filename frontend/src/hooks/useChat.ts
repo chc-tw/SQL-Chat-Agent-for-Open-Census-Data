@@ -3,31 +3,44 @@ import type { ChatMessage, ThinkingStep, TraceData } from "../types/ui";
 import type { SSEEvent } from "../types/api";
 import { getSessionMessages, sendMessage } from "../services/api";
 
-export function useChat(sessionId: string | null) {
+export function useChat(
+  sessionId: string | null,
+  onRename?: (sessionId: string, title: string) => void,
+) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  // Tracks whether send() has been called for the current session.
+  // Prevents a slow getSessionMessages() resolution from overwriting locally-added messages.
+  const sentInSessionRef = useRef(false);
 
   useEffect(() => {
+    sentInSessionRef.current = false; // reset on every session change
     if (!sessionId) {
       setMessages([]);
       return;
     }
+    let active = true;
     getSessionMessages(sessionId).then((msgs) => {
-      setMessages(
-        msgs.map((m) => ({
-          role: m.role as "user" | "assistant",
-          content: m.content,
-          trace: m.trace ? (JSON.parse(m.trace) as TraceData) : undefined,
-        }))
-      );
+      // Guard: if send() was already called before this resolved, keep local state
+      if (active && !sentInSessionRef.current) {
+        setMessages(
+          msgs.map((m) => ({
+            role: m.role as "user" | "assistant",
+            content: m.content,
+            trace: m.trace ? (JSON.parse(m.trace) as TraceData) : undefined,
+          }))
+        );
+      }
     });
+    return () => { active = false; };
   }, [sessionId]);
 
   const send = useCallback(
     async (content: string) => {
       if (!sessionId || isStreaming) return;
 
+      sentInSessionRef.current = true; // block any in-flight getSessionMessages from overwriting
       setMessages((prev) => [...prev, { role: "user", content }]);
       setIsStreaming(true);
 
@@ -174,6 +187,15 @@ export function useChat(sessionId: string | null) {
                   }
                   return updated;
                 });
+                break;
+              }
+              case "session_rename": {
+                try {
+                  const title = JSON.parse(event.data) as string;
+                  if (sessionId && onRename) {
+                    onRename(sessionId, title);
+                  }
+                } catch { /* malformed event, skip */ }
                 break;
               }
             }
