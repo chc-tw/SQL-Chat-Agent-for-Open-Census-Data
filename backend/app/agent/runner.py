@@ -2,12 +2,32 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import Any, AsyncGenerator
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, AsyncGenerator, TypedDict
 
 from app.agent.guardrails import check_guardrails
 from app.agent.prompts import get_system_prompt
 from app.agent.tools import TOOL_DISPATCH, TOOL_SCHEMAS
 from app.services.anthropic_client import client
+
+class TraceIteration(TypedDict, total=False):
+    iteration: int
+    thinking: str
+    tool: str
+    tool_input: dict[str, Any]
+    tool_result: str
+
+
+class TraceData(TypedDict):
+    session_id: str
+    message_id: str
+    user_message: str
+    timestamp: str
+    iterations: list[TraceIteration]
+    final_response: str
+
 
 MODEL = "claude-sonnet-4-20250514"
 MAX_ITERATIONS = 10
@@ -49,8 +69,12 @@ async def run_agent(
     system_prompt = get_system_prompt()
     full_response = ""
 
+    trace_iterations: list[TraceIteration] = []
+    current_trace_iter: TraceIteration = {}
+
     for iteration in range(max_iterations):
         yield {"event": "step_start", "data": {"iteration": iteration}}
+        current_trace_iter = TraceIteration(iteration=iteration, thinking="")
         # Stream the response
         collected_text = ""
         tool_uses: list[dict[str, Any]] = []
@@ -76,6 +100,7 @@ async def run_agent(
                         if event.delta.type == "text_delta":
                             collected_text += event.delta.text
                             yield {"event": "thinking_delta", "data": event.delta.text}
+                            current_trace_iter["thinking"] = current_trace_iter.get("thinking", "") + event.delta.text
                         elif event.delta.type == "input_json_delta":
                             if tool_uses:
                                 tool_uses[-1]["input_json"] += event.delta.partial_json
@@ -116,6 +141,8 @@ async def run_agent(
                 tool_input = parsed_inputs[tu["id"]]
 
                 yield {"event": "tool_use", "data": {"name": tu["name"], "input": tool_input}}
+                current_trace_iter["tool"] = tu["name"]
+                current_trace_iter["tool_input"] = parsed_inputs[tu["id"]]
 
                 # Dispatch tool (run sync tools in thread to avoid blocking event loop)
                 dispatch_fn = TOOL_DISPATCH.get(tu["name"])
@@ -125,6 +152,8 @@ async def run_agent(
                     result = json.dumps({"error": f"Unknown tool: {tu['name']}"})
 
                 yield {"event": "tool_result", "data": {"name": tu["name"], "result": result}}
+                current_trace_iter["tool_result"] = result
+                trace_iterations.append(current_trace_iter)
 
                 tool_results.append({
                     "type": "tool_result",
@@ -136,6 +165,27 @@ async def run_agent(
             continue
 
         # end_turn or max_tokens — we're done
+        trace_iterations.append(current_trace_iter)
         break
 
     yield {"event": "done", "data": full_response}
+
+    # Build trace
+    trace: TraceData = {
+        "session_id": session_id or "",
+        "message_id": message_id or "",
+        "user_message": user_message,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "iterations": trace_iterations,
+        "final_response": full_response,
+    }
+    trace_json = json.dumps(trace, ensure_ascii=False)
+
+    # Write to local file for debugging
+    if session_id and message_id:
+        traces_dir = Path(__file__).parent.parent.parent / "traces"
+        traces_dir.mkdir(exist_ok=True)
+        trace_file = traces_dir / f"{session_id}_{message_id}.json"
+        trace_file.write_text(trace_json, encoding="utf-8")
+
+    yield {"event": "trace", "data": trace_json}
