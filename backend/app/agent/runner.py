@@ -39,7 +39,7 @@ async def run_agent(
     user_message: str,
     chat_history: list[dict[str, Any]] | None = None,
     max_iterations: int = MAX_ITERATIONS,
-    # session_id and message_id are used for trace collection (populated in Task 2)
+    # session_id and message_id are used to name the trace file and populate trace metadata
     session_id: str | None = None,
     message_id: str | None = None,
 ) -> AsyncGenerator[dict[str, Any], None]:
@@ -72,7 +72,6 @@ async def run_agent(
     full_response = ""
 
     trace_iterations: list[TraceIteration] = []
-    current_trace_iter: TraceIteration = {}
 
     for iteration in range(max_iterations):
         yield {"event": "step_start", "data": {"iteration": iteration}}
@@ -143,8 +142,12 @@ async def run_agent(
                 tool_input = parsed_inputs[tu["id"]]
 
                 yield {"event": "tool_use", "data": {"name": tu["name"], "input": tool_input}}
-                current_trace_iter["tool"] = tu["name"]
-                current_trace_iter["tool_input"] = parsed_inputs[tu["id"]]
+                tool_trace = TraceIteration(
+                    iteration=current_trace_iter["iteration"],
+                    thinking=current_trace_iter.get("thinking", ""),
+                    tool=tu["name"],
+                    tool_input=parsed_inputs[tu["id"]],
+                )
 
                 # Dispatch tool (run sync tools in thread to avoid blocking event loop)
                 dispatch_fn = TOOL_DISPATCH.get(tu["name"])
@@ -154,8 +157,8 @@ async def run_agent(
                     result = json.dumps({"error": f"Unknown tool: {tu['name']}"})
 
                 yield {"event": "tool_result", "data": {"name": tu["name"], "result": result}}
-                current_trace_iter["tool_result"] = result
-                trace_iterations.append(dict(current_trace_iter))
+                tool_trace["tool_result"] = result
+                trace_iterations.append(tool_trace)
 
                 tool_results.append({
                     "type": "tool_result",
@@ -190,4 +193,4 @@ async def run_agent(
         trace_file = traces_dir / f"{session_id}_{message_id}.json"
         trace_file.write_text(trace_json, encoding="utf-8")
 
-    yield {"event": "trace", "data": trace}
+    yield {"event": "trace", "data": trace_json}
