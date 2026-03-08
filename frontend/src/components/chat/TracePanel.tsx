@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { ReactNode } from "react";
 import type { TraceData, TraceIteration } from "../../types/ui";
 
 interface TracePanelProps {
@@ -13,7 +14,7 @@ function CodeBlock({ code }: { code: string }) {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="mb-4">
       <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
@@ -94,8 +95,9 @@ function SqlSection({ iterations }: { iterations: TraceIteration[] }) {
           <p className="text-xs text-gray-400 mb-1">Query:</p>
           <CodeBlock
             code={
-              (iter.tool_input as { sql?: string } | undefined)?.sql ??
-              JSON.stringify(iter.tool_input)
+              typeof iter.tool_input?.sql === "string"
+                ? iter.tool_input.sql
+                : JSON.stringify(iter.tool_input) ?? ""
             }
           />
           <p className="text-xs text-gray-400 mt-2 mb-1">Result:</p>
