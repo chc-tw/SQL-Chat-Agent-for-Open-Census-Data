@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from app.agent.prompts import FEATURE_RERANK_PROMPT_TEMPLATE
 from app.services.anthropic_client import sync_client
 from app.services.chromadb_client import chroma_client
 from app.services.embedding_client import embed_text
@@ -199,13 +200,10 @@ def search_feature_schema(query: str, year: str = "2019", top_k: int = 5) -> str
         for i, c in enumerate(candidates)
     )
     n_return = min(top_k, len(candidates))
-    rerank_prompt = (
-        f"You are helping select the most relevant US Census data tables for a query.\n\n"
-        f"User query: {query}\n\n"
-        f"Candidates:\n{candidates_text}\n\n"
-        f"Select the {n_return} most relevant candidates for answering this query. "
-        f"Return only a JSON array of 1-based indices, e.g. [1, 3, 5]. "
-        f"No explanation, just the JSON array."
+    rerank_prompt = FEATURE_RERANK_PROMPT_TEMPLATE.format(
+        query=query,
+        candidates=candidates_text,
+        n_return=n_return,
     )
 
     try:
