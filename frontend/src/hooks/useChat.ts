@@ -65,8 +65,8 @@ export function useChat(sessionId: string | null) {
               }
               case "thinking_delta": {
                 if (currentSteps.length > 0) {
-                  const lastStep = currentSteps[currentSteps.length - 1]!;
-                  lastStep.thinking += event.data;
+                  const last = currentSteps[currentSteps.length - 1]!;
+                  currentSteps[currentSteps.length - 1] = { ...last, thinking: last.thinking + event.data };
                 }
                 setMessages((prev) => {
                   const updated = [...prev];
@@ -82,12 +82,13 @@ export function useChat(sessionId: string | null) {
                 break;
               }
               case "tool_use": {
-                const parsed = JSON.parse(event.data) as { name: string; input: unknown };
-                if (currentSteps.length > 0) {
-                  const lastStep = currentSteps[currentSteps.length - 1]!;
-                  lastStep.toolName = parsed.name;
-                  lastStep.toolInput = parsed.input;
-                }
+                try {
+                  const parsed = JSON.parse(event.data) as { name: string; input: unknown };
+                  if (currentSteps.length > 0) {
+                    const last = currentSteps[currentSteps.length - 1]!;
+                    currentSteps[currentSteps.length - 1] = { ...last, toolName: parsed.name, toolInput: parsed.input };
+                  }
+                } catch { /* malformed event, skip */ }
                 setMessages((prev) => {
                   const updated = [...prev];
                   const last = updated[updated.length - 1];
@@ -102,12 +103,13 @@ export function useChat(sessionId: string | null) {
                 break;
               }
               case "tool_result": {
-                const parsed = JSON.parse(event.data) as { name: string; result: string };
-                if (currentSteps.length > 0) {
-                  const lastStep = currentSteps[currentSteps.length - 1]!;
-                  lastStep.toolResult = parsed.result;
-                  lastStep.isComplete = true;
-                }
+                try {
+                  const parsed = JSON.parse(event.data) as { name: string; result: string };
+                  if (currentSteps.length > 0) {
+                    const last = currentSteps[currentSteps.length - 1]!;
+                    currentSteps[currentSteps.length - 1] = { ...last, toolResult: parsed.result, isComplete: true };
+                  }
+                } catch { /* malformed event, skip */ }
                 setMessages((prev) => {
                   const updated = [...prev];
                   const last = updated[updated.length - 1];
@@ -123,7 +125,9 @@ export function useChat(sessionId: string | null) {
               }
               case "done": {
                 // Mark all steps complete, set final content
-                currentSteps.forEach((s) => (s.isComplete = true));
+                const completedSteps = currentSteps.map((s) => ({ ...s, isComplete: true }));
+                currentSteps.length = 0;
+                completedSteps.forEach((s) => currentSteps.push(s));
                 setMessages((prev) => {
                   const updated = [...prev];
                   const last = updated[updated.length - 1];
@@ -139,15 +143,17 @@ export function useChat(sessionId: string | null) {
                 break;
               }
               case "trace": {
-                const traceData = JSON.parse(event.data) as TraceData;
-                setMessages((prev) => {
-                  const updated = [...prev];
-                  const last = updated[updated.length - 1];
-                  if (last) {
-                    updated[updated.length - 1] = { ...last, trace: traceData };
-                  }
-                  return updated;
-                });
+                try {
+                  const traceData = JSON.parse(event.data) as TraceData;
+                  setMessages((prev) => {
+                    const updated = [...prev];
+                    const last = updated[updated.length - 1];
+                    if (last) {
+                      updated[updated.length - 1] = { ...last, trace: traceData };
+                    }
+                    return updated;
+                  });
+                } catch { /* malformed event, skip */ }
                 break;
               }
               case "error": {
