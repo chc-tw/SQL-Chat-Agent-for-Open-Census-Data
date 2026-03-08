@@ -12,8 +12,11 @@ from app.agent.prompts import get_system_prompt
 from app.agent.tools import TOOL_DISPATCH, TOOL_SCHEMAS
 from app.services.anthropic_client import client
 
-class TraceIteration(TypedDict, total=False):
+class _TraceIterationRequired(TypedDict):
     iteration: int
+
+
+class TraceIteration(_TraceIterationRequired, total=False):
     thinking: str
     tool: str
     tool_input: dict[str, Any]
