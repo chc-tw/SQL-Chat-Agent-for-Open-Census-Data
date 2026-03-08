@@ -58,6 +58,11 @@ async def delete_session(username: str, session_id: str) -> None:
     await session_ref.delete()
 
 
+async def update_session_title(username: str, session_id: str, title: str) -> None:
+    session_ref = _sessions_ref(username).document(session_id)
+    await session_ref.update({"title": title})
+
+
 async def add_message(
     username: str,
     session_id: str,
