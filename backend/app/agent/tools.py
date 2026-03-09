@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from app.agent.prompts import FEATURE_RERANK_PROMPT_TEMPLATE
@@ -33,6 +34,8 @@ _STATE_ABBREVS: dict[str, str] = {
     "district of columbia": "DC",
 }
 
+_KNOWLEDGE_DIR = Path(__file__).parent.parent.parent / "docs" / "tool_knowledge"
+
 # ---------------------------------------------------------------------------
 # Tool schemas (Anthropic format)
 # ---------------------------------------------------------------------------
@@ -42,10 +45,12 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         "name": "search_fips_codes",
         "description": (
             "Search FIPS code metadata to resolve one or more geographic locations into "
-            "FIPS codes. Each location is a {county, state} pair — leave either blank if "
-            "unknown. Providing both county and state filters more precisely than either alone. "
-            "All locations are resolved in a single call. "
-            "Returns matching rows with STATE, STATE_FIPS, COUNTY_FIPS, COUNTY per location."
+            "FIPS codes. Each location is a {county, state} pair. "
+            "Providing both county and state filters most precisely — leave either blank only if truly unknown. "
+            "All locations are resolved in a single call — batch all needed locations together. "
+            "State full names are automatically resolved to abbreviations (e.g., 'California' → 'CA'). "
+            "Returns matching rows with STATE, STATE_FIPS, COUNTY_FIPS, COUNTY per location. "
+            "FIPS codes are strings — STATE_FIPS is 2 digits, COUNTY_FIPS is 5 digits (state+county combined)."
         ),
         "input_schema": {
             "type": "object",
@@ -88,11 +93,13 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         "name": "search_feature_schema",
         "description": (
             "Search for relevant census feature tables by semantic similarity. "
-            "Embeds the query and searches one of four ChromaDB collections: "
-            "'2019' (2019 ACS field metadata), '2020' (2020 ACS field metadata), "
-            "'2020_redistricting' (2020 redistricting-specific fields), or "
-            "'2019_patterns' (SafeGraph CBG mobility/visit pattern columns). "
-            "Returns top-K results with topic and universe."
+            "Searches one of four ChromaDB collections — choose the right one for your question:\n"
+            "  '2019': 2019 ACS demographic fields (income, age, race, housing, education, etc.)\n"
+            "  '2020': 2020 ACS demographic fields (same topics, different year)\n"
+            "  '2020_redistricting': 2020 redistricting-specific population fields\n"
+            "  '2019_patterns': SafeGraph CBG mobility columns (visit counts, visitor counts, distance, brand patterns)\n"
+            "Returns top-K results with topic and universe. "
+            "If results are empty, call fetch_knowledge('search_feature_schema') for fallback strategies."
         ),
         "input_schema": {
             "type": "object",
@@ -118,8 +125,12 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         "name": "get_field_descriptions",
         "description": (
             "Get detailed column/field descriptions for a specific table title from "
-            "the Snowflake metadata. Returns all column definitions (TABLE_ID/COLUMN_ID, "
-            "field levels) so you can identify the exact column names to use in SQL."
+            "the Snowflake metadata. Returns all column definitions so you can identify exact column names for SQL.\n"
+            "Year differences:\n"
+            "  '2019' and '2020': search by TABLE_TITLE (e.g., 'MEDIAN HOUSEHOLD INCOME', 'SEX BY AGE'). "
+            "The returned TABLE_NUMBER prefix determines the data table (e.g., 'B19013' → prefix 'B19' → table '2019_CBG_B19').\n"
+            "  '2020_redistricting': search by COLUMN_TOPIC instead of TABLE_TITLE.\n"
+            "Try broad search terms if a specific title returns no results (e.g., 'INCOME' instead of 'MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS')."
         ),
         "input_schema": {
             "type": "object",
@@ -141,8 +152,13 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         "name": "execute_sql",
         "description": (
             "Execute a SQL query against Snowflake and return results. "
-            "Results are truncated to 50 rows. If the query fails, the error "
-            "message is returned so you can fix and retry."
+            "Only SELECT and WITH queries are allowed. Results are truncated to 50 rows.\n"
+            "Column name rules:\n"
+            "  - ACS population table column names are mixed-case (e.g., 'B01001e1', 'B19013e1'). "
+            "Snowflake uppercases unquoted identifiers, so you MUST double-quote them: \"B19013e1\" not B19013e1.\n"
+            "  - Always verify exact column names with SELECT * FROM {table} LIMIT 5 before writing analytical queries.\n"
+            "  - FIPS filter values must be quoted strings: LEFT(CENSUS_BLOCK_GROUP, 5) = '06073' not = 6073.\n"
+            "If the query fails with an invalid identifier error, call fetch_knowledge('execute_sql') before retrying."
         ),
         "input_schema": {
             "type": "object",
@@ -153,6 +169,29 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
                 },
             },
             "required": ["sql"],
+        },
+    },
+    {
+        "name": "fetch_knowledge",
+        "description": (
+            "Fetch a recovery guide for a tool that returned an error or empty results. "
+            "Call this before retrying a failed tool call. "
+            "Available for all four tools:\n"
+            "  'search_fips_codes' — no matches, ambiguous county names, multi-county regions\n"
+            "  'search_feature_schema' — empty results, fallback strategies\n"
+            "  'get_field_descriptions' — no fields found, reading output, year differences\n"
+            "  'execute_sql' — invalid identifier, empty results, table not found, patterns columns"
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "tool_name": {
+                    "type": "string",
+                    "enum": ["search_fips_codes", "search_feature_schema", "get_field_descriptions", "execute_sql"],
+                    "description": "The name of the tool to fetch recovery guidance for.",
+                },
+            },
+            "required": ["tool_name"],
         },
     },
 ]
@@ -314,6 +353,20 @@ def get_field_descriptions(table_title: str, year: str = "2019") -> str:
         return json.dumps({"error": str(e)})
 
 
+_VALID_KNOWLEDGE_TOOLS = {"search_fips_codes", "search_feature_schema", "get_field_descriptions", "execute_sql"}
+
+
+def fetch_knowledge(tool_name: str) -> str:
+    """Return the knowledge/recovery guide for a specific tool."""
+    if tool_name not in _VALID_KNOWLEDGE_TOOLS:
+        return json.dumps({"error": f"No knowledge file found for tool '{tool_name}'. Available: search_fips_codes, search_feature_schema, get_field_descriptions, execute_sql"})
+    knowledge_file = _KNOWLEDGE_DIR / f"{tool_name}.md"
+    if not knowledge_file.exists():
+        return json.dumps({"error": f"Knowledge file missing for tool '{tool_name}'."})
+    content = knowledge_file.read_text(encoding="utf-8")
+    return json.dumps({"knowledge": content})
+
+
 def execute_sql(sql: str) -> str:
     # Only allow SELECT statements for safety
     stripped = sql.strip().upper()
@@ -346,4 +399,5 @@ TOOL_DISPATCH: dict[str, callable] = {
         table_title=args["table_title"], year=args.get("year", "2019")
     ),
     "execute_sql": lambda args: execute_sql(sql=args["sql"]),
+    "fetch_knowledge": lambda args: fetch_knowledge(tool_name=args["tool_name"]),
 }
