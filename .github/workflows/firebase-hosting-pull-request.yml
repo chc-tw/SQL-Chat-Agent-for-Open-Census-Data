@@ -20,6 +20,8 @@ jobs:
           cache-dependency-path: frontend/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile && pnpm run build
         working-directory: frontend
+        env:
+          VITE_API_BASE_URL: ${{ secrets.CLOUD_RUN_URL }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
