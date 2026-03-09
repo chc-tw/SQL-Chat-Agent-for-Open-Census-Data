@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -6,14 +7,22 @@ WORKDIR /app
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 # Copy dependency files
-COPY pyproject.toml uv.lock ./
+COPY backend/pyproject.toml backend/uv.lock ./
 
 # Install dependencies
 RUN uv sync --frozen --no-dev
 
 # Copy application code
-COPY app/ app/
-COPY chroma_db/ chroma_db/
+COPY backend/app/ app/
+
+# Copy dataset CSV files needed to build the ChromaDB index
+COPY Dataset/FEATURE_OPTION_TABLE/ /Dataset/FEATURE_OPTION_TABLE/
+
+# Build ChromaDB vector index from CSV files (OPENAI_API_KEY injected as BuildKit secret)
+RUN --mount=type=secret,id=openai_key \
+    OPENAI_API_KEY=$(cat /run/secrets/openai_key) \
+    uv run python -m app.utils.index_metadata && \
+    rm -rf /Dataset
 
 # Expose port
 EXPOSE 8080
