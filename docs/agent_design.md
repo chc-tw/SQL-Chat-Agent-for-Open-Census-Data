@@ -78,21 +78,19 @@ This phase is the key to accuracy and must handle **geographic entities** and **
 
 **Objective:** From thousands of Census columns, accurately identify the needed `COLUMN_ID` and `TABLE_PREFIX`.
 
-**Implementation Details (Revised Flow):**
+**Implementation Details:**
 
-1. **Step A: Concept Search via Embeddings**
-* **Preparation:** Combine `TABLE_TITLE` and `TABLE_UNIVERSE` from the metadata table into a description, compute embeddings, and store in a vector DB.
-* **Execution:** Convert `raw_feature_concepts` into a vector and search the vector DB.
-* **Output:** Top-K most relevant `(Table Title, Table Universe)` pairs (e.g., “Sex by Age”).
+1. **Step A: Semantic Search + LLM Reranking (`search_feature_schema`)**
+* **Preparation:** Combine `TABLE_TITLE` and `TABLE_UNIVERSE` from the metadata table into a description, compute embeddings (OpenAI `text-embedding-3-large`), and store in ChromaDB.
+* **Execution:** Embed the user query, retrieve the top-30 candidates from ChromaDB by vector similarity, then call claude-haiku to rerank and return the top-K most relevant results.
+* **Output:** Top-K most relevant table descriptors (e.g., topic: “Median Household Income”, universe: “Households”).
 
-2. **Step B: Detailed Schema Lookup**
-* **Execution:** Use the Table Title/Universe from Step A to query the SQL metadata table (`METADATA_CBG_FIELD_DESCRIPTIONS`) for all rows under that concept.
-* **Output:** All column definitions under that table (e.g., `B01001e1: Male: 5 to 9 years`, `B01001e2: Male: 10 to 14 years`). Typically dozens of fields.
+2. **Step B: Detailed Schema Lookup (`get_field_descriptions`)**
+* **Execution:** Use the table topic from Step A to query Snowflake's `METADATA_CBG_FIELD_DESCRIPTIONS` table for all column definitions under that concept.
+* **Output:** All column definitions under that table (e.g., `B19013e1: Median household income`). Typically dozens of fields.
 
-3. **Step C: LLM Precise Selection**
-* **Prompt:** Put the detailed field list from Step B into context.
-* **Instruction:** “User asks for '{raw_feature_concepts}'. From the list below, select the exact `COLUMN_ID` and extract its `TABLE_ID` prefix (first 3 chars after 'CBG_').”
-* **Output:** The selected `COLUMN_ID` (e.g., `B19013e1`) and `TABLE_PREFIX` (e.g., `B19`).
+3. **Step C: Agent Column Selection**
+* The main agent (claude-sonnet) reads the field list returned in Step B and selects the exact `TABLE_ID` column (e.g., `B19013e1`) and derives the `TABLE_PREFIX` (first 3 chars of the table number, e.g., `B19`) as part of its ReAct reasoning — no separate LLM call needed.
 
 ---
 
