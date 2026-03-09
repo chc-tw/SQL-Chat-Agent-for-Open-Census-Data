@@ -2,7 +2,7 @@
  
 ## How to access
 
-Go the website [link](https://chc-snowflake-agent.web.app/) and use one of the following accounts to login. Note that different account will have different session and have different chat history records.
+Go to the website [link](https://chc-snowflake-agent.web.app/) and use one of the following accounts to login. Note that different account will have different session and have different chat history records.
 
 | account | password |
 | --- | --- |
@@ -26,7 +26,7 @@ Go the website [link](https://chc-snowflake-agent.web.app/) and use one of the f
 
 At first, I invested a lot of time to write documents about project structure, agent design and system design to make sure the process of developement can be stable and I can utilize these docs to guide AI to support me develope the code. (All under the `docs` folder)
 
-Instead of using library such as Langchain or CrewAI, I choosed to use native API to build agent on my own to have fully controll about its behavior. I initially try to use typescript for full-stack development, but I noticed the SDK support of Claude API in typescript is not as good as python, so I changed the tech stack using python to build backend. 
+Instead of using library such as Langchain or CrewAI, I choosed to use native API to build agent on my own to have fully controll about its behavior. I initially tried to use Typescript for full-stack development, but I noticed the SDK support of Claude API in typescript is not as good as Python, so I changed the tech stack using Python to build backend. 
 
 The development process is:
 agent logic -> API Endpoint -> Frontend -> features adding -> agent validation and improvement
@@ -35,6 +35,8 @@ The most challenging part is to make agent successfully write the correct SQL, b
 
 ## Future Improvement
 ### Agent
+[] add more knowledges to improve performance
+[] add human-in-loop to clarify user's intention. For example, when use says "New York", agent should ask is it New York city or New York state.
 
 ### Web
 [] enable chat edit
