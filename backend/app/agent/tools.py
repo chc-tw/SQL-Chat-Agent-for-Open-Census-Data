@@ -88,20 +88,23 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         "name": "search_feature_schema",
         "description": (
             "Search for relevant census feature tables by semantic similarity. "
-            "Embeds the query and searches the ChromaDB vector store for matching "
-            "TABLE_TITLE / TABLE_UNIVERSE pairs. Returns top-K results with topic and universe."
+            "Embeds the query and searches one of four ChromaDB collections: "
+            "'2019' (2019 ACS field metadata), '2020' (2020 ACS field metadata), "
+            "'2020_redistricting' (2020 redistricting-specific fields), or "
+            "'2019_patterns' (SafeGraph CBG mobility/visit pattern columns). "
+            "Returns top-K results with topic and universe."
         ),
         "input_schema": {
             "type": "object",
             "properties": {
                 "query": {
                     "type": "string",
-                    "description": "Natural language description of the census feature (e.g., 'median household income', 'educational attainment').",
+                    "description": "Natural language description of the census feature (e.g., 'median household income', 'educational attainment', 'visit count').",
                 },
                 "year": {
                     "type": "string",
-                    "enum": ["2019", "2020", "2020_redistricting"],
-                    "description": "The dataset year to search in. Use '2020_redistricting' for redistricting-specific features.",
+                    "enum": ["2019", "2020", "2020_redistricting", "2019_patterns"],
+                    "description": "Which collection to search: '2019' or '2020' for ACS demographic fields, '2020_redistricting' for redistricting-specific features, '2019_patterns' for SafeGraph mobility/visit pattern columns.",
                 },
                 "top_k": {
                     "type": "integer",
@@ -217,6 +220,7 @@ def search_feature_schema(query: str, year: str = "2019", top_k: int = 5) -> str
         "2019": "2019_field_metadata",
         "2020": "2020_field_metadata",
         "2020_redistricting": "2020_redistricting_field_metadata",
+        "2019_patterns": "2019_cbg_patterns_all_column",
     }
     collection_name = collection_map.get(year)
     if not collection_name:

@@ -30,6 +30,7 @@ def index_metadata_csv(csv_path: Path) -> str:
             topic = (
                 row.get("TABLE_TITLE")
                 or row.get("COLUMN_TOPIC")
+                or row.get("COLUMN_NAME")
                 or row.get("topic")
                 or row.get("Topic")
                 or ""
@@ -39,7 +40,7 @@ def index_metadata_csv(csv_path: Path) -> str:
                 or row.get("COLUMN_UNIVERSE")
                 or row.get("universe")
                 or row.get("Universe")
-                or ""
+                or ("SafeGraph CBG mobility patterns" if row.get("COLUMN_NAME") else "")
             ).strip()
             if not topic or not universe:
                 continue
