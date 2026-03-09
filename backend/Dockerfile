@@ -19,8 +19,12 @@ COPY backend/app/ app/
 COPY Dataset/FEATURE_OPTION_TABLE/ /Dataset/FEATURE_OPTION_TABLE/
 
 # Build ChromaDB vector index from CSV files (OPENAI_API_KEY injected as BuildKit secret)
+# Dummy Snowflake/Anthropic vars satisfy pydantic validation at import time; only OPENAI_API_KEY is used.
 RUN --mount=type=secret,id=openai_key \
     OPENAI_API_KEY=$(cat /run/secrets/openai_key) \
+    SNOWFLAKE_ACCOUNT=x SNOWFLAKE_USER=x SNOWFLAKE_PASSWORD=x \
+    SNOWFLAKE_WAREHOUSE=x SNOWFLAKE_DATABASE=x SNOWFLAKE_SCHEMA=x \
+    ANTHROPIC_API_KEY=x \
     uv run python -m app.utils.index_metadata && \
     rm -rf /Dataset
 
