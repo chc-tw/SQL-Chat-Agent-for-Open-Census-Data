@@ -60,7 +60,10 @@ async def delete_session(username: str, session_id: str) -> None:
 
 async def update_session_title(username: str, session_id: str, title: str) -> None:
     session_ref = _sessions_ref(username).document(session_id)
-    await session_ref.update({"title": title})
+    try:
+        await session_ref.update({"title": title})
+    except Exception:
+        pass  # session may have been deleted before title resolved
 
 
 async def add_message(

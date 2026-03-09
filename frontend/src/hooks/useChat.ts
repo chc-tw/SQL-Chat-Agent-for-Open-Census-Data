@@ -221,7 +221,7 @@ export function useChat(
         abortRef.current = null;
       }
     },
-    [sessionId, isStreaming]
+    [sessionId, isStreaming, onRename]
   );
 
   return { messages, isStreaming, send };
