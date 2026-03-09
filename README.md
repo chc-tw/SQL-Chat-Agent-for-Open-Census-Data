@@ -4,6 +4,8 @@
 
 Go to the website [link](https://chc-snowflake-agent.web.app/) and use one of the following accounts to login. Note that different account will have different session and have different chat history records.
 
+> Note that initial access might be delayed due to Cloud Run cold starts
+
 | account | password |
 | --- | --- |
 | user1 | password1 |
@@ -24,7 +26,7 @@ Go to the website [link](https://chc-snowflake-agent.web.app/) and use one of th
 | 23 hr ~ 26 gr | agent validation and improvement |
 | 26 hr ~ 30 hr | deployment & conclusion |
 
-At first, I invested a lot of time to write documents about project structure, agent design and system design to make sure the process of developement can be stable and I can utilize these docs to guide AI to support me develope the code. (All under the `docs` folder)
+At first, I invested a lot of time to write documents about project structure, agent design and system design to make sure the process of developement can be stable and I can utilize these docs to guide AI to support me develope the code. (All under the `docs` folder). The main doc about feature and tech stack is `docs/background.md`.
 
 Instead of using library such as Langchain or CrewAI, I choosed to use native API to build agent on my own to have fully controll about its behavior. I initially tried to use Typescript for full-stack development, but I noticed the SDK support of Claude API in typescript is not as good as Python, so I changed the tech stack using Python to build backend. 
 

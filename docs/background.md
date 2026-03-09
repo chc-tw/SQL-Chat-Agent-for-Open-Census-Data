@@ -11,6 +11,7 @@ We are working on US Open Census Dataset on snowflake. We want to create a web a
 - The agent must preserve conversation context; the user can answer multiple follow-up questions, and the agent should respond appropriately.
 - Apply guardrails to ensure the agent does not answer off topic questions or provide “not safe for work” responses.
 - Stream the output to the frontend
+- Load context of tool usage knowledge dynamically (see `docs/context_management`)
 
 ### SQL writing and data retrieval
 - The agent should be able to write SQL queries based on the user's questions and execute them against the census dataset.
