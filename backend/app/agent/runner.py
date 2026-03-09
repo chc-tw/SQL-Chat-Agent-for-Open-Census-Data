@@ -34,7 +34,7 @@ class TraceData(TypedDict):
 
 
 MODEL = "claude-sonnet-4-6"
-MAX_ITERATIONS = 10
+MAX_ITERATIONS = 15
 
 
 async def run_agent(

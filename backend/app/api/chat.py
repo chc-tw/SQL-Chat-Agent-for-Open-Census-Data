@@ -53,7 +53,7 @@ async def generate_session_title(user_message: str) -> str:
     try:
         response = await anthropic_client.messages.create(
             model=_TITLE_MODEL,
-            max_tokens=24,
+            max_tokens=128,
             system=SESSION_TITLE_PROMPT,
             messages=[{"role": "user", "content": user_message}],
         )

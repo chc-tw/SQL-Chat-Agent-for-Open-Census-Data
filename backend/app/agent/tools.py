@@ -304,7 +304,7 @@ def search_feature_schema(query: str, year: str = "2019", top_k: int = 5) -> str
     try:
         rerank_response = sync_client.messages.create(
             model=_RERANK_MODEL,
-            max_tokens=128,
+            max_tokens=1280,
             messages=[{"role": "user", "content": rerank_prompt}],
         )
         rerank_text = rerank_response.content[0].text.strip()

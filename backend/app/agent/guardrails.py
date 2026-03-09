@@ -34,7 +34,7 @@ async def check_guardrails(
     try:
         response = await client.messages.create(
             model=GUARDRAIL_MODEL,
-            max_tokens=60,
+            max_tokens=500,
             system=GUARDRAIL_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": eval_message}],
         )
