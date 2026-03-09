@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import uuid
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sse_starlette.sse import EventSourceResponse
@@ -17,6 +19,33 @@ from app.services.auth import get_current_user
 from app.services import firestore_client as fs
 
 _TITLE_MODEL = "claude-haiku-4-5-20251001"
+_TRACES_DIR = Path(__file__).parent.parent.parent / "traces"
+
+
+def _sanitize_filename(title: str) -> str:
+    """Convert a session title into a safe filename component."""
+    slug = re.sub(r"[^\w\s-]", "", title.lower())
+    slug = re.sub(r"[\s_-]+", "_", slug).strip("_")
+    return slug[:40] or "new_chat"
+
+
+def _append_trace_to_file(trace: dict, session_id: str, title: str) -> None:
+    """Append a trace dict to traces/{title}_{short_id}.json (JSON array per session)."""
+    try:
+        _TRACES_DIR.mkdir(exist_ok=True)
+        short_id = session_id[:8]
+        trace_file = _TRACES_DIR / f"{_sanitize_filename(title)}_{short_id}.json"
+        existing: list = []
+        if trace_file.exists():
+            try:
+                parsed = json.loads(trace_file.read_text(encoding="utf-8"))
+                existing = parsed if isinstance(parsed, list) else [parsed]
+            except (json.JSONDecodeError, OSError):
+                existing = []
+        existing.append(trace)
+        trace_file.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:
+        pass  # trace file writing is best-effort for local debug
 
 
 async def generate_session_title(user_message: str) -> str:
@@ -95,12 +124,18 @@ async def send_message(
 
     is_first_message = len(chat_history) == 0
 
+    # Fetch current session title for trace filename (existing sessions already have one)
+    session_data = await fs.get_session(user.username, session_id)
+    current_title = session_data.get("title", "New Chat")
+
     async def event_generator():
         message_id = str(uuid.uuid4())
         full_response = ""
         message_saved = False
         title_task: asyncio.Task | None = None
         title_emitted = False
+        resolved_title = current_title  # updated if title_task resolves
+        buffered_trace: dict | None = None
 
         # Start title generation concurrently for first message only
         if is_first_message:
@@ -117,6 +152,7 @@ async def send_message(
             if event["event"] == "done":
                 full_response = event["data"]
             elif event["event"] == "trace":
+                buffered_trace = event["data"]
                 trace_str = json.dumps(event["data"])
                 await fs.add_message(
                     user.username, session_id, "assistant", full_response,
@@ -131,9 +167,9 @@ async def send_message(
 
             # Emit session_rename as soon as title is ready (non-blocking poll)
             if title_task and not title_emitted and title_task.done():
-                title = title_task.result()
-                await fs.update_session_title(user.username, session_id, title)
-                yield {"event": "session_rename", "data": json.dumps(title)}
+                resolved_title = title_task.result()
+                await fs.update_session_title(user.username, session_id, resolved_title)
+                yield {"event": "session_rename", "data": json.dumps(resolved_title)}
                 title_emitted = True
 
         # Fallback: save without trace if trace event never fired
@@ -142,8 +178,12 @@ async def send_message(
 
         # If title not emitted yet (haiku slower than agent), await and emit now
         if title_task and not title_emitted:
-            title = await title_task
-            await fs.update_session_title(user.username, session_id, title)
-            yield {"event": "session_rename", "data": json.dumps(title)}
+            resolved_title = await title_task
+            await fs.update_session_title(user.username, session_id, resolved_title)
+            yield {"event": "session_rename", "data": json.dumps(resolved_title)}
+
+        # Append trace to per-session file (uses resolved title for readable filename)
+        if buffered_trace and session_id:
+            _append_trace_to_file(buffered_trace, session_id, resolved_title)
 
     return EventSourceResponse(event_generator())

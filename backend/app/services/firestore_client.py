@@ -24,6 +24,13 @@ async def create_session(username: str, title: str = "New Chat") -> dict[str, An
     return {"session_id": session_ref.id, **data}
 
 
+async def get_session(username: str, session_id: str) -> dict[str, Any]:
+    doc = await _sessions_ref(username).document(session_id).get()
+    if not doc.exists:
+        return {}
+    return {"session_id": doc.id, **doc.to_dict()}
+
+
 async def list_sessions(username: str) -> list[dict[str, Any]]:
     sessions_ref = _sessions_ref(username)
     docs = sessions_ref.order_by("created_at", direction="DESCENDING").stream()

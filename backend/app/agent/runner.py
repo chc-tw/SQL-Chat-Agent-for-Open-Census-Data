@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import json
+import time
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any, AsyncGenerator, TypedDict
 
-from app.agent.guardrails import check_guardrails
-from app.agent.prompts import get_system_prompt
+from app.agent.prompts import AGENT_SYSTEM_PROMPT
 from app.agent.tools import TOOL_DISPATCH, TOOL_SCHEMAS
 from app.services.anthropic_client import client
 
@@ -29,6 +28,9 @@ class TraceData(TypedDict):
     timestamp: str
     iterations: list[TraceIteration]
     final_response: str
+    input_tokens: int
+    output_tokens: int
+    duration_ms: int
 
 
 MODEL = "claude-sonnet-4-6"
@@ -54,13 +56,6 @@ async def run_agent(
         {"event": "done", "data": "<full response text>"}
         {"event": "error", "data": "<error message>"}
     """
-    # Guardrails check (async LLM-based)
-    is_safe, rejection = await check_guardrails(user_message)
-    if not is_safe:
-        yield {"event": "error", "data": rejection}
-        yield {"event": "done", "data": rejection}
-        return
-
     # Build messages array
     messages: list[dict[str, Any]] = []
     if chat_history:
@@ -68,10 +63,12 @@ async def run_agent(
             messages.append({"role": msg["role"], "content": msg["content"]})
     messages.append({"role": "user", "content": user_message})
 
-    system_prompt = get_system_prompt()
     full_response = ""
 
     trace_iterations: list[TraceIteration] = []
+    total_input_tokens = 0
+    total_output_tokens = 0
+    start_time = time.perf_counter()
 
     for iteration in range(max_iterations):
         yield {"event": "step_start", "data": {"iteration": iteration}}
@@ -85,12 +82,14 @@ async def run_agent(
             async with client.messages.stream(
                 model=MODEL,
                 max_tokens=4096,
-                system=system_prompt,
+                system=AGENT_SYSTEM_PROMPT,
                 messages=messages,
                 tools=TOOL_SCHEMAS,
             ) as stream:
                 async for event in stream:
-                    if event.type == "content_block_start":
+                    if event.type == "message_start":
+                        total_input_tokens += event.message.usage.input_tokens
+                    elif event.type == "content_block_start":
                         if event.content_block.type == "tool_use":
                             tool_uses.append({
                                 "id": event.content_block.id,
@@ -107,6 +106,8 @@ async def run_agent(
                                 tool_uses[-1]["input_json"] += event.delta.partial_json
                     elif event.type == "message_delta":
                         stop_reason = event.delta.stop_reason
+                        if hasattr(event, "usage") and event.usage:
+                            total_output_tokens += event.usage.output_tokens
 
         except Exception as e:
             yield {"event": "error", "data": str(e)}
@@ -185,6 +186,8 @@ async def run_agent(
             f"Please try rephrasing your question or breaking it into smaller parts."
         )
 
+    duration_ms = int((time.perf_counter() - start_time) * 1000)
+
     yield {"event": "done", "data": full_response}
 
     # Build trace
@@ -195,14 +198,8 @@ async def run_agent(
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "iterations": trace_iterations,
         "final_response": full_response,
+        "input_tokens": total_input_tokens,
+        "output_tokens": total_output_tokens,
+        "duration_ms": duration_ms,
     }
-    trace_json = json.dumps(trace, ensure_ascii=False)
-
-    # Write to local file for debugging
-    if session_id and message_id:
-        traces_dir = Path(__file__).parent.parent.parent / "traces"
-        traces_dir.mkdir(exist_ok=True)
-        trace_file = traces_dir / f"{session_id}_{message_id}.json"
-        trace_file.write_text(trace_json, encoding="utf-8")
-
-    yield {"event": "trace", "data": trace_json}
+    yield {"event": "trace", "data": trace}

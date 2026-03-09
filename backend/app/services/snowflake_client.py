@@ -9,7 +9,7 @@ def connect_snowflake():
     Create a Snowflake connection using username/password from environment variables.
     """
     conn = snowflake.connector.connect(
-        **snowflake_settings.model_dump()
+        **snowflake_settings.model_dump(by_alias=True)
     )
     return conn
 

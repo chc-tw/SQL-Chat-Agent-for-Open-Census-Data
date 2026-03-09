@@ -37,7 +37,42 @@ class AnthropicSettings(BaseSettings):
         extra="ignore",
     )
 
+class OpenAISettings(BaseSettings):
+    api_key: str = Field(default=...)
+    model_config = SettingsConfigDict(
+        env_prefix="OPENAI_",
+        env_file=str(ENV_FILE),
+        case_sensitive=False,
+        extra="ignore",
+    )
+
+class AuthSettings(BaseSettings):
+    jwt_secret: str = Field(default="dev-secret-change-me")
+    jwt_algorithm: str = Field(default="HS256")
+    jwt_expiration_hours: int = Field(default=24)
+    users: str = Field(default='[{"username":"admin","password":"admin"}]')
+
+    model_config = SettingsConfigDict(
+        env_file=str(ENV_FILE),
+        case_sensitive=False,
+        extra="ignore",
+    )
+
+
+class FirestoreSettings(BaseSettings):
+    project_id: str = Field(default="chc-snowflake-agent")
+
+    model_config = SettingsConfigDict(
+        env_file=str(ENV_FILE),
+        env_prefix="GCP_",
+        case_sensitive=False,
+        extra="ignore",
+    )
+
 
 # All settings
 snowflake_settings = SnowflakeSettings()
 anthropic_settings = AnthropicSettings()
+openai_settings = OpenAISettings()
+auth_settings = AuthSettings()
+firestore_settings = FirestoreSettings()

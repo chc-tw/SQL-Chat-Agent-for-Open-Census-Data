@@ -41,16 +41,39 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
     {
         "name": "search_fips_codes",
         "description": (
-            "Search FIPS code metadata to resolve a geographic name (state or county) "
-            "into FIPS codes. Use ILIKE fuzzy matching on STATE and COUNTY columns. "
-            "Returns matching rows with STATE, STATE_FIPS, COUNTY_FIPS, COUNTY."
+            "Search FIPS code metadata to resolve one or more geographic locations into "
+            "FIPS codes. Each location is a {county, state} pair — leave either blank if "
+            "unknown. Providing both county and state filters more precisely than either alone. "
+            "All locations are resolved in a single call. "
+            "Returns matching rows with STATE, STATE_FIPS, COUNTY_FIPS, COUNTY per location."
         ),
         "input_schema": {
             "type": "object",
             "properties": {
-                "geo_name": {
-                    "type": "string",
-                    "description": "The geographic name to search for (e.g., 'Fulton County', 'Georgia', 'CA').",
+                "locations": {
+                    "type": "array",
+                    "description": (
+                        "List of locations to resolve. Each entry has 'county' and 'state' — "
+                        "leave either as an empty string if unknown. "
+                        "Examples: [{'county': 'Fulton', 'state': 'GA'}, "
+                        "{'county': 'San Diego County', 'state': ''}, "
+                        "{'county': '', 'state': 'California'}]"
+                    ),
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "county": {
+                                "type": "string",
+                                "description": "County name or partial name (e.g., 'Fulton', 'San Diego County'). Leave blank for state-only search.",
+                            },
+                            "state": {
+                                "type": "string",
+                                "description": "State name or abbreviation (e.g., 'GA', 'California'). Leave blank for county-only search.",
+                            },
+                        },
+                        "required": ["county", "state"],
+                    },
+                    "minItems": 1,
                 },
                 "year": {
                     "type": "string",
@@ -58,7 +81,7 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
                     "description": "The dataset year to search in. Defaults to '2019'.",
                 },
             },
-            "required": ["geo_name"],
+            "required": ["locations"],
         },
     },
     {
@@ -137,23 +160,52 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
 # ---------------------------------------------------------------------------
 
 
-def search_fips_codes(geo_name: str, year: str = "2019") -> str:
-    # Resolve full state names to abbreviations
-    search_term = _STATE_ABBREVS.get(geo_name.lower().strip(), geo_name)
+def search_fips_codes(locations: list[dict[str, str]], year: str = "2019") -> str:
+    """
+    Resolve a list of {county, state} pairs to FIPS codes in one call.
+    Providing both county and state uses AND for precise matching.
+    """
     table = f'{DB_PREFIX}."{year}_METADATA_CBG_FIPS_CODES"'
-    sql = (
-        f"SELECT STATE, STATE_FIPS, COUNTY_FIPS, COUNTY "
-        f"FROM {table} "
-        f"WHERE STATE ILIKE '%{search_term}%' OR COUNTY ILIKE '%{search_term}%' "
-        f"LIMIT 20"
-    )
-    try:
-        rows = run_query(sql)
-        if not rows:
-            return json.dumps({"results": [], "message": f"No FIPS codes found for '{geo_name}'"})
-        return json.dumps({"results": rows}, default=str)
-    except Exception as e:
-        return json.dumps({"error": str(e)})
+    all_results: list[dict] = []
+
+    for loc in locations:
+        county = loc.get("county", "").strip()
+        state = loc.get("state", "").strip()
+
+        # Resolve full state name to abbreviation
+        state = _STATE_ABBREVS.get(state.lower(), state)
+
+        if county and state:
+            where = f"COUNTY ILIKE '%{county}%' AND STATE ILIKE '%{state}%'"
+        elif county:
+            where = f"COUNTY ILIKE '%{county}%'"
+        elif state:
+            where = f"STATE ILIKE '%{state}%'"
+        else:
+            continue  # skip blank entries
+
+        sql = (
+            f"SELECT STATE, STATE_FIPS, COUNTY_FIPS, COUNTY "
+            f"FROM {table} "
+            f"WHERE {where} "
+            f"LIMIT 20"
+        )
+        try:
+            rows = run_query(sql)
+            label = f"{county}, {state}".strip(", ")
+            all_results.append({
+                "location": label,
+                "matches": rows,
+            })
+        except Exception as e:
+            all_results.append({
+                "location": f"{county}, {state}".strip(", "),
+                "error": str(e),
+            })
+
+    if not all_results:
+        return json.dumps({"results": [], "message": "No valid locations provided."})
+    return json.dumps({"results": all_results}, default=str)
 
 
 def search_feature_schema(query: str, year: str = "2019", top_k: int = 5) -> str:
@@ -281,7 +333,7 @@ def execute_sql(sql: str) -> str:
 
 TOOL_DISPATCH: dict[str, callable] = {
     "search_fips_codes": lambda args: search_fips_codes(
-        geo_name=args["geo_name"], year=args.get("year", "2019")
+        locations=args["locations"], year=args.get("year", "2019")
     ),
     "search_feature_schema": lambda args: search_feature_schema(
         query=args["query"], year=args.get("year", "2019"), top_k=args.get("top_k", 5)
