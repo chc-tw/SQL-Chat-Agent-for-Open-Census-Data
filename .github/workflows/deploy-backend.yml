@@ -41,7 +41,7 @@ jobs:
             --platform managed \
             --service-account chc-snowflake-agent-sa@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
             --set-secrets "ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,OPENAI_API_KEY=OPENAI_API_KEY:latest,SNOWFLAKE_ACCOUNT=SNOWFLAKE_ACCOUNT:latest,SNOWFLAKE_USER=SNOWFLAKE_USER:latest,SNOWFLAKE_PASSWORD=SNOWFLAKE_PASSWORD:latest,SNOWFLAKE_DATABASE=SNOWFLAKE_DATABASE:latest,SNOWFLAKE_WAREHOUSE=SNOWFLAKE_WAREHOUSE:latest,SNOWFLAKE_SCHEMA=SNOWFLAKE_SCHEMA:latest,JWT_SECRET=JWT_SECRET:latest,USERS=USERS:latest" \
-            --set-env-vars "GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},ALLOWED_ORIGINS=https://chc-snowflake-agent.web.app,https://chc-snowflake-agent.firebaseapp.com" \
+            --set-env-vars "^|^GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}|ALLOWED_ORIGINS=https://chc-snowflake-agent.web.app,https://chc-snowflake-agent.firebaseapp.com" \
             --allow-unauthenticated \
             --memory 1Gi \
             --timeout 300
