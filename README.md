@@ -26,14 +26,21 @@ Go to the website [link](https://chc-snowflake-agent.web.app/) and use one of th
 | 23 hr ~ 26 gr | agent validation and improvement |
 | 26 hr ~ 30 hr | deployment & conclusion |
 
-At first, I invested a lot of time to write documents about project structure, agent design and system design to make sure the process of developement can be stable and I can utilize these docs to guide AI to support me develope the code. (All under the `docs` folder). The main doc about feature and tech stack is `docs/background.md`.
+At first, I invested a lot of time to write documents about project structure, agent design and system design to make sure the process of developement can be stable and I can utilize these docs to guide AI to support me develope the code. (All under the `docs` folder). List of docs:
+1. `docs/background.md`: The main doc about feature and tech stack
+2. `docs/agent_design`: The design of agent
+3. `docs/agent_evaluation.md`: The mechanism of agent validation
+4. `docs/context_management.md`: The mechanism of dynamic context management for knowledge loading.
+5. `docs/database_structure.md`: The explanation docs of database structure.
 
-Instead of using library such as Langchain or CrewAI, I choosed to use native API to build agent on my own to have fully controll about its behavior. I initially tried to use Typescript for full-stack development, but I noticed the SDK support of Claude API in typescript is not as good as Python, so I changed the tech stack using Python to build backend. 
+### Implementation details
+
+Instead of using library such as Langchain or CrewAI, I choosed to use native API to build agent engin on my own to have fully controll about its behavior. I initially tried to use Typescript for full-stack development, but I noticed the SDK support of Claude API in typescript is not as good as Python, so I changed the tech stack using Python to build backend. 
 
 The development process is:
 agent logic -> API Endpoint -> Frontend -> features adding -> agent validation and improvement
 
-The most challenging part is to make agent successfully write the correct SQL, because it contains the metadata mapping and join operation. 
+The most challenging part is to make agent successfully write the correct SQL, because it contains the complex metadata mapping and join operation. 
 
 ## Future Improvement
 ### Agent
