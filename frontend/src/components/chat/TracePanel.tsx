@@ -8,7 +8,14 @@ interface TracePanelProps {
 
 function CodeBlock({ code }: { code: string }) {
   return (
-    <pre className="text-xs bg-gray-50 border border-gray-200 rounded p-2 overflow-x-auto whitespace-pre-wrap break-words max-h-48">
+    <pre
+      className="text-xs rounded-lg p-3 overflow-x-auto whitespace-pre-wrap break-words max-h-48 border border-[var(--border-dim)] leading-relaxed"
+      style={{
+        background: "var(--bg-base)",
+        color: "var(--cyan)",
+        fontFamily: "JetBrains Mono, monospace",
+      }}
+    >
       {code}
     </pre>
   );
@@ -17,7 +24,14 @@ function CodeBlock({ code }: { code: string }) {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="mb-4">
-      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+      <h4
+        className="text-xs font-semibold uppercase tracking-widest mb-2 flex items-center gap-2"
+        style={{ color: "var(--text-lo)" }}
+      >
+        <span
+          className="w-1 h-1 rounded-full inline-block"
+          style={{ background: "var(--accent)" }}
+        />
         {title}
       </h4>
       {children}
@@ -32,9 +46,9 @@ function FipsSection({ iterations }: { iterations: TraceIteration[] }) {
     <Section title="FIPS Resolution">
       {items.map((iter, i) => (
         <div key={i} className="mb-2">
-          <p className="text-xs text-gray-500 mb-1">
+          <p className="text-xs mb-1" style={{ color: "var(--text-lo)" }}>
             Query:{" "}
-            <span className="font-mono text-gray-700">
+            <span style={{ color: "var(--text-mid)", fontFamily: "JetBrains Mono, monospace" }}>
               {JSON.stringify(iter.tool_input)}
             </span>
           </p>
@@ -52,9 +66,9 @@ function FeatureSearchSection({ iterations }: { iterations: TraceIteration[] }) 
     <Section title="Feature Search">
       {items.map((iter, i) => (
         <div key={i} className="mb-2">
-          <p className="text-xs text-gray-500 mb-1">
+          <p className="text-xs mb-1" style={{ color: "var(--text-lo)" }}>
             Query:{" "}
-            <span className="font-mono text-gray-700">
+            <span style={{ color: "var(--text-mid)", fontFamily: "JetBrains Mono, monospace" }}>
               {JSON.stringify(iter.tool_input)}
             </span>
           </p>
@@ -72,9 +86,9 @@ function FieldDescSection({ iterations }: { iterations: TraceIteration[] }) {
     <Section title="Field Descriptions">
       {items.map((iter, i) => (
         <div key={i} className="mb-2">
-          <p className="text-xs text-gray-500 mb-1">
+          <p className="text-xs mb-1" style={{ color: "var(--text-lo)" }}>
             Table:{" "}
-            <span className="font-mono text-gray-700">
+            <span style={{ color: "var(--text-mid)", fontFamily: "JetBrains Mono, monospace" }}>
               {JSON.stringify(iter.tool_input)}
             </span>
           </p>
@@ -92,7 +106,7 @@ function SqlSection({ iterations }: { iterations: TraceIteration[] }) {
     <Section title="SQL Query">
       {items.map((iter, i) => (
         <div key={i} className="mb-3">
-          <p className="text-xs text-gray-400 mb-1">Query:</p>
+          <p className="text-xs mb-1" style={{ color: "var(--text-lo)" }}>Query:</p>
           <CodeBlock
             code={
               typeof iter.tool_input?.sql === "string"
@@ -100,7 +114,7 @@ function SqlSection({ iterations }: { iterations: TraceIteration[] }) {
                 : JSON.stringify(iter.tool_input) ?? ""
             }
           />
-          <p className="text-xs text-gray-400 mt-2 mb-1">Result:</p>
+          <p className="text-xs mt-2 mb-1" style={{ color: "var(--text-lo)" }}>Result:</p>
           <CodeBlock code={iter.tool_result ?? "(no result)"} />
         </div>
       ))}
@@ -115,8 +129,13 @@ function ReasoningSection({ iterations }: { iterations: TraceIteration[] }) {
     <Section title="Reasoning">
       {items.map((iter) => (
         <div key={iter.iteration} className="mb-2">
-          <p className="text-xs text-gray-400 mb-0.5">Step {iter.iteration + 1}</p>
-          <p className="text-xs italic text-gray-600 whitespace-pre-wrap leading-relaxed">
+          <p className="text-xs mb-0.5" style={{ color: "var(--text-lo)" }}>
+            Step {iter.iteration + 1}
+          </p>
+          <p
+            className="text-xs italic whitespace-pre-wrap leading-relaxed"
+            style={{ color: "var(--text-mid)" }}
+          >
             {iter.thinking}
           </p>
         </div>
@@ -129,15 +148,35 @@ export function TracePanel({ trace }: TracePanelProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="mt-3 pt-2 border-t border-gray-100">
+    <div className="mt-4 pt-3 border-t border-[var(--border-dim)]">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+        className="flex items-center gap-1.5 text-xs transition-colors duration-150 group"
+        style={{ color: "var(--text-lo)" }}
       >
-        {open ? "Hide Trace ▲" : "View Trace ▼"}
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 10 10"
+          fill="none"
+          className="transition-transform duration-150"
+          style={{ transform: open ? "rotate(90deg)" : "rotate(0deg)" }}
+        >
+          <path d="M3 2l4 3-4 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <span
+          className="group-hover:text-[var(--text-mid)] transition-colors"
+          style={{ fontFamily: "JetBrains Mono, monospace" }}
+        >
+          {open ? "hide trace" : "view trace"}
+        </span>
       </button>
+
       {open && (
-        <div className="mt-3">
+        <div
+          className="mt-3 rounded-xl border border-[var(--border-dim)] p-4"
+          style={{ background: "var(--bg-surface)" }}
+        >
           <FipsSection iterations={trace.iterations} />
           <FeatureSearchSection iterations={trace.iterations} />
           <FieldDescSection iterations={trace.iterations} />

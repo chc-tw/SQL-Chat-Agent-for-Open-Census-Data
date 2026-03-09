@@ -207,6 +207,7 @@ marimo/_lsp/
 __marimo__/
 
 Dataset
+dataset_description
 safegraph_open_census_data_2019/
 .backup
 .claude

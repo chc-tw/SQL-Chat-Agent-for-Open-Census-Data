@@ -21,6 +21,9 @@ export interface TraceData {
   timestamp: string;
   iterations: TraceIteration[];
   final_response: string;
+  input_tokens?: number;
+  output_tokens?: number;
+  duration_ms?: number;
 }
 
 export interface ChatMessage {
