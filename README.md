@@ -15,7 +15,7 @@ Go to the website [link](https://chc-snowflake-agent.web.app/) and use one of th
 | user5 | password1 |
 
 ## Development Process
-- Timeline
+**Timeline**
 
 | time | progress |
 | --- | --- |
