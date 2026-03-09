@@ -1,0 +1,708 @@
+{
+  "easy": [
+    {
+      "id": 1,
+      "question": "What is the median household income in Fulton County, GA in 2020?",
+      "follow_up_question": "Can you break that median household income down by age of householder in Fulton County, GA for 2020?"
+    },
+    {
+      "id": 2,
+      "question": "Compare median household income between San Diego County, CA and King County, WA in 2020.",
+      "follow_up_question": "What is the percentage difference in median household income between San Diego County and King County in 2020?"
+    },
+    {
+      "id": 3,
+      "question": "What is the aggregate household income in Los Angeles County, CA in 2019?",
+      "follow_up_question": "How does Los Angeles County’s 2019 aggregate household income compare to 2020?"
+    },
+    {
+      "id": 4,
+      "question": "Show the household income distribution by age of householder for Cook County, IL in 2020.",
+      "follow_up_question": "Which age-of-householder group has the highest household income count in Cook County, IL in 2020?"
+    },
+    {
+      "id": 5,
+      "question": "What is the median family income in Harris County, TX in 2020?",
+      "follow_up_question": "How does Harris County’s median family income in 2020 compare with the Texas statewide value?"
+    },
+    {
+      "id": 6,
+      "question": "Compare family poverty status between Maricopa County, AZ and Clark County, NV in 2020.",
+      "follow_up_question": "Which of Maricopa or Clark has a higher share of families below poverty in 2020?"
+    },
+    {
+      "id": 7,
+      "question": "For Miami-Dade County, FL, what is the poverty status of families by family type and children in 2019?",
+      "follow_up_question": "Can you isolate households with related children under 6 in Miami-Dade County for 2019?"
+    },
+    {
+      "id": 8,
+      "question": "In Travis County, TX, what are the counts for internet subscriptions in household in 2020?",
+      "follow_up_question": "Which internet subscription type is most common in Travis County households in 2020?"
+    },
+    {
+      "id": 9,
+      "question": "Compare presence of a computer and internet subscription in household for Orange County, CA vs Santa Clara County, CA in 2020.",
+      "follow_up_question": "Can you show the gap in broadband-related categories between Orange and Santa Clara counties in 2020?"
+    },
+    {
+      "id": 10,
+      "question": "What are the types of computers in household in New York County, NY in 2019?",
+      "follow_up_question": "Can you also show total households so we can compute each computer-type share in New York County for 2019?"
+    },
+    {
+      "id": 11,
+      "question": "For Bexar County, TX, show educational attainment by presence of computer and internet subscription in 2020.",
+      "follow_up_question": "How does the internet-subscription mix differ by educational attainment level in Bexar County in 2020?"
+    },
+    {
+      "id": 12,
+      "question": "What is the wage or salary income for households in Philadelphia County, PA in 2020?",
+      "follow_up_question": "Can you compare Philadelphia County’s wage or salary household income to neighboring Bucks and Montgomery counties in 2020?"
+    },
+    {
+      "id": 13,
+      "question": "In Wayne County, MI, what is the self-employment income for households in 2019?",
+      "follow_up_question": "What share of Wayne County households reported self-employment income in 2019?"
+    },
+    {
+      "id": 14,
+      "question": "Show social security income for households in Cuyahoga County, OH in 2020.",
+      "follow_up_question": "Can you compare social security income and retirement income for households in Cuyahoga County in 2020?"
+    },
+    {
+      "id": 15,
+      "question": "What is the retirement income for households in Palm Beach County, FL in 2020?",
+      "follow_up_question": "Which household age groups in Palm Beach County rely most on retirement income in 2020?"
+    },
+    {
+      "id": 16,
+      "question": "In Denver County, CO, what is the aggregate public assistance income for households in 2019?",
+      "follow_up_question": "Can you compare Denver County’s aggregate public assistance income with nearby Adams and Arapahoe counties in 2019?"
+    },
+    {
+      "id": 17,
+      "question": "For Salt Lake County, UT, what is the receipt of SNAP by disability status for households in 2020?",
+      "follow_up_question": "Within Salt Lake County, which disability-status group has the highest SNAP receipt in 2020?"
+    },
+    {
+      "id": 18,
+      "question": "Compare household type (including living alone) between Allegheny County, PA and Hennepin County, MN in 2020.",
+      "follow_up_question": "Can you normalize those household-type counts as percentages for Allegheny and Hennepin in 2020?"
+    },
+    {
+      "id": 19,
+      "question": "In Nashville (Davidson County), TN, what are households by presence of people under 18 by household type in 2020?",
+      "follow_up_question": "Which household type in Davidson County has the highest share with people under 18 in 2020?"
+    },
+    {
+      "id": 20,
+      "question": "For Seattle (King County), WA, what are households by presence of people 65+ and household size/type in 2019?",
+      "follow_up_question": "Can you compare Seattle/King County’s 2019 65+ household pattern with 2020?"
+    },
+    {
+      "id": 21,
+      "question": "What is the median age by sex (Hispanic or Latino) in Bronx County, NY in 2020?",
+      "follow_up_question": "How does Bronx County’s Hispanic median age by sex compare with Queens County in 2020?"
+    },
+    {
+      "id": 22,
+      "question": "Compare aggregate income for Hispanic or Latino population 15+ between El Paso County, TX and Pima County, AZ in 2020.",
+      "follow_up_question": "Which county has higher aggregate income per Hispanic resident age 15+ in 2020, El Paso or Pima?"
+    },
+    {
+      "id": 23,
+      "question": "In Alameda County, CA, what is school enrollment by detailed level (Asian alone) in 2019?",
+      "follow_up_question": "Can you focus only on college and graduate enrollment levels for Asian alone in Alameda County in 2019?"
+    },
+    {
+      "id": 24,
+      "question": "In DeKalb County, GA, what is field of bachelor’s degree for first major (Black or African American alone) in 2020?",
+      "follow_up_question": "Which bachelor’s major category is most common for Black or African American alone in DeKalb County in 2020?"
+    },
+    {
+      "id": 25,
+      "question": "What is sex by occupation for civilian employed population 16+ in Mecklenburg County, NC in 2020?",
+      "follow_up_question": "Can you summarize the top three occupation groups by count in Mecklenburg County in 2020?"
+    },
+    {
+      "id": 26,
+      "question": "Compare sex by industry for civilian employed population 16+ between Suffolk County, MA and Middlesex County, MA in 2020.",
+      "follow_up_question": "Which industry category shows the largest gap between Suffolk and Middlesex counties in 2020?"
+    },
+    {
+      "id": 27,
+      "question": "In Santa Fe County, NM, what is types of health insurance coverage by age in 2019?",
+      "follow_up_question": "Can you compare Santa Fe County’s health insurance by age results to New Mexico statewide in 2019?"
+    },
+    {
+      "id": 28,
+      "question": "For Honolulu County, HI, what is age by veteran status by poverty status by disability status in 2020?",
+      "follow_up_question": "In Honolulu County, which veteran/disability subgroup has the highest poverty burden in 2020?"
+    },
+    {
+      "id": 29,
+      "question": "In Multnomah County, OR, what is period of military service for civilian veterans 18+ in 2020?",
+      "follow_up_question": "Can you break military service periods into pre- and post-2001 groups for Multnomah County in 2020?"
+    },
+    {
+      "id": 30,
+      "question": "Compare citizen voting-age population by educational attainment for Fulton County, GA and DeKalb County, GA in 2020.",
+      "follow_up_question": "Which county has higher educational attainment among citizen voting-age population in 2020, Fulton or DeKalb?"
+    },
+    {
+      "id": 31,
+      "question": "What is the race breakdown in Fulton County, GA (2020 redistricting)?",
+      "follow_up_question": "Can you show race shares as percentages instead of raw counts for Fulton County redistricting data?"
+    },
+    {
+      "id": 32,
+      "question": "Compare race between San Diego County, CA and Orange County, CA (2020 redistricting).",
+      "follow_up_question": "Which race category contributes most to the difference between San Diego and Orange counties?"
+    },
+    {
+      "id": 33,
+      "question": "What is Hispanic or Latino vs not Hispanic or Latino by race in Harris County, TX?",
+      "follow_up_question": "Can you separate the Hispanic-origin by race output into percentages for Harris County?"
+    },
+    {
+      "id": 34,
+      "question": "Compare Hispanic or Latino vs not Hispanic or Latino by race between Miami-Dade County, FL and Broward County, FL.",
+      "follow_up_question": "Which county has the higher Hispanic share across all races, Miami-Dade or Broward?"
+    },
+    {
+      "id": 35,
+      "question": "What is race for population age 18 and over in Cook County, IL?",
+      "follow_up_question": "Can you compare 18+ race composition in Cook County against all-age race composition?"
+    },
+    {
+      "id": 36,
+      "question": "Compare race for population age 18+ between Maricopa County, AZ and Clark County, NV.",
+      "follow_up_question": "Which county has the larger non-White 18+ population share, Maricopa or Clark?"
+    },
+    {
+      "id": 37,
+      "question": "What is Hispanic or Latino vs not Hispanic or Latino by race for population age 18+ in Los Angeles County, CA?",
+      "follow_up_question": "Can you rank the top three race categories within the Hispanic and non-Hispanic 18+ groups in Los Angeles County?"
+    },
+    {
+      "id": 38,
+      "question": "In New York County, NY, show group quarters population by major group quarters type.",
+      "follow_up_question": "Which major group quarters type is dominant in New York County?"
+    },
+    {
+      "id": 39,
+      "question": "Compare group quarters population by major type between King County, WA and Snohomish County, WA.",
+      "follow_up_question": "Can you add a third county benchmark, like Pierce County, to compare with King and Snohomish?"
+    },
+    {
+      "id": 40,
+      "question": "For city-level phrasing test: What is the race profile for Austin, TX?",
+      "follow_up_question": "Did you map Austin city to Travis County only, or did you include multi-county metro coverage?"
+    },
+    {
+      "id": 41,
+      "question": "What is the raw visit count in Fulton County, GA for 2019 patterns data?",
+      "follow_up_question": "Can you also report raw visitor count and visits-per-visitor for Fulton County in 2019?"
+    },
+    {
+      "id": 42,
+      "question": "Compare raw visitor count between San Diego County, CA and Riverside County, CA in 2019.",
+      "follow_up_question": "Which county has higher visits per visitor in 2019, San Diego or Riverside?"
+    },
+    {
+      "id": 43,
+      "question": "In Cook County, IL, what is the average distance from home for visits in 2019 patterns?",
+      "follow_up_question": "Can you provide median and percentile values for distance_from_home in Cook County 2019 patterns?"
+    },
+    {
+      "id": 44,
+      "question": "For Miami-Dade County, FL, what are the top values in top brands in 2019 patterns?",
+      "follow_up_question": "Can you list the top 10 brands with counts for Miami-Dade County in 2019 patterns?"
+    },
+    {
+      "id": 45,
+      "question": "What are related same-day brand affinities in King County, WA in 2019?",
+      "follow_up_question": "How stable are related same-day brand affinities over different months in King County 2019 data?"
+    },
+    {
+      "id": 46,
+      "question": "What are related same-month brand affinities in Maricopa County, AZ in 2019?",
+      "follow_up_question": "Can you compare related same-month brand affinities between Maricopa and neighboring Pinal County?"
+    },
+    {
+      "id": 47,
+      "question": "In Los Angeles County, CA, show popularity by hour patterns for 2019.",
+      "follow_up_question": "What are the peak and off-peak hours in Los Angeles County’s 2019 popularity-by-hour profile?"
+    },
+    {
+      "id": 48,
+      "question": "In Harris County, TX, show popularity by day patterns for 2019.",
+      "follow_up_question": "Which day of week has the highest popularity in Harris County in 2019?"
+    },
+    {
+      "id": 49,
+      "question": "For Philadelphia County, PA, summarize visitor_home_cbgs in 2019 patterns.",
+      "follow_up_question": "Can you return the top origin CBGs contributing to visitor_home_cbgs for Philadelphia County?"
+    },
+    {
+      "id": 50,
+      "question": "For Dallas County, TX, summarize visitor_work_cbgs in 2019 patterns.",
+      "follow_up_question": "Can you identify the largest work-origin CBG clusters for Dallas County visitors in 2019?"
+    },
+    {
+      "id": 51,
+      "question": "Between 2019-06-01 and 2019-06-30, what is the raw visit count in Clark County, NV?",
+      "follow_up_question": "How does Clark County’s June 2019 raw visit count compare with May and July 2019?"
+    },
+    {
+      "id": 52,
+      "question": "Compare raw visit count in Orange County, CA vs San Bernardino County, CA for July 2019.",
+      "follow_up_question": "Can you normalize July 2019 raw visit counts by population for Orange vs San Bernardino?"
+    },
+    {
+      "id": 53,
+      "question": "What is the population-related metric for Springfield?",
+      "follow_up_question": "Which Springfield do you want: Illinois, Massachusetts, Missouri, or another one?"
+    },
+    {
+      "id": 54,
+      "question": "Show median household income for Washington County.",
+      "follow_up_question": "Which Washington County do you mean, and in which state?"
+    },
+    {
+      "id": 55,
+      "question": "Compare median household income in Fulton County, GA and Fulton County, NY.",
+      "follow_up_question": "Do you want absolute difference or percentage difference for the two Fulton counties?"
+    },
+    {
+      "id": 56,
+      "question": "What was median household income in 2021 for Travis County, TX?",
+      "follow_up_question": "The dataset only covers 2019–2020; should I use 2020 as the closest available year?"
+    },
+    {
+      "id": 57,
+      "question": "Show 2019 patterns popularity by hour for Austin city, TX.",
+      "follow_up_question": "Do you want Austin mapped to Travis County only, or Austin metro counties as well?"
+    },
+    {
+      "id": 58,
+      "question": "Give Hispanic or Latino by race for population 18+ in San Juan County.",
+      "follow_up_question": "Which San Juan County do you mean: New Mexico, Washington, Colorado, or Utah?"
+    },
+    {
+      "id": 59,
+      "question": "Compare internet subscriptions in household across California, Texas, and Florida.",
+      "follow_up_question": "Should I aggregate to state totals or return county-level breakdowns for California, Texas, and Florida?"
+    },
+    {
+      "id": 60,
+      "question": "Which county in Georgia has the highest median household income in 2020?",
+      "follow_up_question": "Do you want ranking based on raw median household income only, or with a minimum-household threshold filter?"
+    }
+  ],
+  "medium": [
+    {
+      "id": 61,
+      "question": "For the Bay Area, what is the distribution of household language by limited English-speaking status in 2020?",
+      "follow_up_question": "Should I interpret Bay Area as the 9-county definition, or a smaller subset?"
+    },
+    {
+      "id": 62,
+      "question": "In New York City, what are households by presence of nonrelatives in 2019?",
+      "follow_up_question": "Do you want New York City as the five borough counties only, or NYC metro?"
+    },
+    {
+      "id": 63,
+      "question": "Across the DMV area, compare household type by household size in 2020.",
+      "follow_up_question": "Should DMV include only DC plus close-in Maryland/Virginia counties, or a wider commuter shed?"
+    },
+    {
+      "id": 64,
+      "question": "In Greater LA, what are cohabiting couple households by presence and age of own children under 18 in 2020?",
+      "follow_up_question": "For Greater LA, do you want Los Angeles County only or LA-OC-IE combined?"
+    },
+    {
+      "id": 65,
+      "question": "For the Twin Cities, report public assistance income or SNAP for households in 2020.",
+      "follow_up_question": "Should Twin Cities include just Hennepin and Ramsey, or the broader metro counties?"
+    },
+    {
+      "id": 66,
+      "question": "In the Research Triangle, what is labor force status by computer/internet subscription in household in 2020?",
+      "follow_up_question": "For Research Triangle, should I use Wake, Durham, and Orange counties?"
+    },
+    {
+      "id": 67,
+      "question": "For Silicon Valley, show allocation of occupation for civilian employed population 16+ in 2020.",
+      "follow_up_question": "Do you want Silicon Valley as Santa Clara County only, or include San Mateo and Alameda parts?"
+    },
+    {
+      "id": 68,
+      "question": "In the Inland Empire, what is allocation of industry for civilian employed population 16+ in 2019?",
+      "follow_up_question": "Should Inland Empire be defined as Riverside and San Bernardino counties?"
+    },
+    {
+      "id": 69,
+      "question": "For South Florida, compare sex by class of worker for civilian employed population 16+ in 2020.",
+      "follow_up_question": "For South Florida, do you want Miami-Dade, Broward, and Palm Beach counties?"
+    },
+    {
+      "id": 70,
+      "question": "In Metro Atlanta, what is allocation of class of worker for civilian employed population 16+ in 2020?",
+      "follow_up_question": "Should Metro Atlanta use the 5 core counties or the full 29-county MSA?"
+    },
+    {
+      "id": 71,
+      "question": "For the Front Range in Colorado, what are households by type in 2020?",
+      "follow_up_question": "Do you want Front Range limited to Denver-Aurora corridor counties or the full Colorado urban corridor?"
+    },
+    {
+      "id": 72,
+      "question": "In Upstate New York, what is allocation of household internet access in 2019?",
+      "follow_up_question": "How are you defining Upstate New York for this query?"
+    },
+    {
+      "id": 73,
+      "question": "For the Rust Belt, compare allocation of household computer type across major counties in 2020.",
+      "follow_up_question": "Which Rust Belt counties should be included in the comparison set?"
+    },
+    {
+      "id": 74,
+      "question": "In the Gulf Coast of Texas, what is household income in the last 12 months by presence/type of internet subscription in 2020?",
+      "follow_up_question": "Should Gulf Coast of Texas include only coastal counties, or nearby inland metros too?"
+    },
+    {
+      "id": 75,
+      "question": "In the Puget Sound region, what is aggregate self-employment income for households in 2020?",
+      "follow_up_question": "For Puget Sound region, should I include King, Pierce, Snohomish, and Kitsap?"
+    },
+    {
+      "id": 76,
+      "question": "For the Emerald City area, report interest/dividends/net rental income for households in 2019.",
+      "follow_up_question": "Do you mean Seattle city boundaries or broader King County when you say Emerald City area?"
+    },
+    {
+      "id": 77,
+      "question": "In the Big Apple, what is aggregate retirement income for households in 2020?",
+      "follow_up_question": "Should Big Apple be treated as New York County only or all NYC borough counties?"
+    },
+    {
+      "id": 78,
+      "question": "For the City by the Bay, what are households by presence of people 60+ by household type in 2020?",
+      "follow_up_question": "For City by the Bay, do you mean San Francisco County specifically?"
+    },
+    {
+      "id": 79,
+      "question": "In Chicagoland, what is age of householder by household income in 2019?",
+      "follow_up_question": "Should Chicagoland include Cook + collar counties, or Cook County only?"
+    },
+    {
+      "id": 80,
+      "question": "Across SoCal, compare aggregate supplemental security income (SSI) for households in 2020.",
+      "follow_up_question": "For SoCal, what county set should I use for the comparison?"
+    },
+    {
+      "id": 81,
+      "question": "In the Valley (Phoenix metro), what is other types of income in the past 12 months for households in 2020?",
+      "follow_up_question": "For Valley (Phoenix metro), should I include Maricopa plus Pinal county?"
+    },
+    {
+      "id": 82,
+      "question": "For the Vegas metro area, what is aggregate public assistance income for households in 2019?",
+      "follow_up_question": "Do you want Vegas metro as Clark County only, or include nearby counties?"
+    },
+    {
+      "id": 83,
+      "question": "In the Texas Triangle, compare allocation of family income in past 12 months (percent allocated) in 2020.",
+      "follow_up_question": "For Texas Triangle, should the comparison focus on Houston, DFW, Austin, and San Antonio core counties?"
+    },
+    {
+      "id": 84,
+      "question": "For the Capital Region around Albany, what is allocation of poverty status in past 12 months for families in 2020?",
+      "follow_up_question": "Should Capital Region around Albany include Albany, Schenectady, Rensselaer, and Saratoga counties?"
+    },
+    {
+      "id": 85,
+      "question": "In the Wasatch Front, what is family size by cash public assistance income or SNAP benefits in 2019?",
+      "follow_up_question": "For Wasatch Front, which Utah counties should be in scope?"
+    },
+    {
+      "id": 86,
+      "question": "For the Black Hills region, what is aggregate income deficit for families below poverty level in 2020?",
+      "follow_up_question": "Do you want Black Hills represented by Pennington and Lawrence counties only?"
+    },
+    {
+      "id": 87,
+      "question": "In the Great Plains, what is allocation of year of naturalization in 2020?",
+      "follow_up_question": "Great Plains is broad—should I limit to specific states or metro counties?"
+    },
+    {
+      "id": 88,
+      "question": "For the Space Coast, what is allocation of grandparents responsible for grandchildren under 18 in 2019?",
+      "follow_up_question": "For Space Coast, should I use Brevard County only?"
+    },
+    {
+      "id": 89,
+      "question": "In Appalachia, what is sex by work status / usual hours / weeks worked for population 65+ in 2020?",
+      "follow_up_question": "How should we define Appalachia here: ARC counties or a smaller custom set?"
+    },
+    {
+      "id": 90,
+      "question": "For the Desert Southwest, compare sex by occupation for full-time, year-round civilian employed population 16+ in 2020.",
+      "follow_up_question": "For Desert Southwest, which counties should be compared?"
+    },
+    {
+      "id": 91,
+      "question": "In NYC, what is group quarters population by major group quarters type (redistricting)?",
+      "follow_up_question": "For NYC, should group quarters be aggregated across all five borough counties?"
+    },
+    {
+      "id": 92,
+      "question": "For the Bay Area, what is race for the population 18 years and over (redistricting)?",
+      "follow_up_question": "In Bay Area redistricting, should I return county-level race-for-18+ or one regional aggregate?"
+    },
+    {
+      "id": 93,
+      "question": "In Greater Houston, what is Hispanic or Latino vs not Hispanic by race for population 18+ (redistricting)?",
+      "follow_up_question": "For Greater Houston, should the redistricting output be Harris County only or metro counties?"
+    },
+    {
+      "id": 94,
+      "question": "Across the Inland Northwest, compare Hispanic or Latino vs not Hispanic by race (redistricting).",
+      "follow_up_question": "Which states and counties should define Inland Northwest for this redistricting comparison?"
+    },
+    {
+      "id": 95,
+      "question": "In the LA metro, what is RACE from the 2020 redistricting data?",
+      "follow_up_question": "For LA metro redistricting, do you want Los Angeles County alone or multi-county metro coverage?"
+    },
+    {
+      "id": 96,
+      "question": "For NYC, what are the 2019 patterns related same-day brand signals?",
+      "follow_up_question": "For NYC related same-day brand signals, should I aggregate all borough counties or report each separately?"
+    },
+    {
+      "id": 97,
+      "question": "In the Bay Area, what are 2019 patterns related same-month brand signals?",
+      "follow_up_question": "For Bay Area related same-month brands, should I provide top brands by county or regional aggregate?"
+    },
+    {
+      "id": 98,
+      "question": "For Greater Boston, show 2019 patterns visitor_work_cbgs characteristics.",
+      "follow_up_question": "For Greater Boston visitor_work_cbgs, should I focus on Suffolk only or include metro counties?"
+    },
+    {
+      "id": 99,
+      "question": "In the DC metro, summarize 2019 patterns visitor_home_cbgs.",
+      "follow_up_question": "For DC metro visitor_home_cbgs, should DC be combined with suburban Maryland and Virginia counties?"
+    },
+    {
+      "id": 100,
+      "question": "For SoCal, compare 2019 patterns distance_from_home between subregions.",
+      "follow_up_question": "For SoCal distance_from_home, which subregions do you want compared?"
+    }
+  ],
+  "hard": [
+    {
+      "id": 101,
+      "question": "In the Springfield area, what is the allocation of household internet subscription type in 2020?",
+      "follow_up_question": "Which Springfield area do you mean—Illinois, Massachusetts, Missouri, or another?"
+    },
+    {
+      "id": 102,
+      "question": "For the Tri-Cities, compare household type (including living alone) in 2019.",
+      "follow_up_question": "Do you mean the Tri-Cities in Washington, Tennessee/Virginia, or elsewhere?"
+    },
+    {
+      "id": 103,
+      "question": "In the Peninsula, what are types of computers in household in 2020?",
+      "follow_up_question": "Which Peninsula are you referring to—SF Peninsula, Olympic Peninsula, or another one?"
+    },
+    {
+      "id": 104,
+      "question": "For the Valley, what is public assistance income in the past 12 months for households in 2020?",
+      "follow_up_question": "Which Valley do you mean—San Fernando Valley, Phoenix Valley, or another?"
+    },
+    {
+      "id": 105,
+      "question": "In the Metroplex, what is aggregate wage or salary income for households in 2020?",
+      "follow_up_question": "For Metroplex, should I use Dallas and Tarrant core counties or a larger DFW set?"
+    },
+    {
+      "id": 106,
+      "question": "Across the Golden Triangle, compare aggregate household income by age of householder in 2019.",
+      "follow_up_question": "Which Golden Triangle are you referring to—Texas Gulf Coast, Pennsylvania, or another region?"
+    },
+    {
+      "id": 107,
+      "question": "In the Inland Northwest, what is presence and types of internet subscriptions in household in 2020?",
+      "follow_up_question": "For Inland Northwest, which states/counties should be included?"
+    },
+    {
+      "id": 108,
+      "question": "For the Capital District, report poverty status in the past 12 months by household type by age of householder in 2020.",
+      "follow_up_question": "By Capital District, do you mean the Albany area counties?"
+    },
+    {
+      "id": 109,
+      "question": "In the North Shore, what are households by presence of people under 18 by household type in 2019?",
+      "follow_up_question": "Which North Shore do you mean—Massachusetts, Chicagoland, Minnesota, or Long Island?"
+    },
+    {
+      "id": 110,
+      "question": "For the South Bay, show households by type in 2020.",
+      "follow_up_question": "Which South Bay do you mean—SF Bay South Bay or LA South Bay?"
+    },
+    {
+      "id": 111,
+      "question": "In the East Bay, what is aggregate social security income for households in 2020?",
+      "follow_up_question": "For East Bay, should I include Alameda and Contra Costa counties only?"
+    },
+    {
+      "id": 112,
+      "question": "For the Westside, what is aggregate earnings in the past 12 months for households in 2019?",
+      "follow_up_question": "Which city’s Westside are you referring to?"
+    },
+    {
+      "id": 113,
+      "question": "In the Panhandle, compare receipt of SNAP by disability status for households in 2020.",
+      "follow_up_question": "Which Panhandle do you mean—Texas, Florida, Idaho, Nebraska, or West Virginia?"
+    },
+    {
+      "id": 114,
+      "question": "Across the Lowcountry, what is household language by limited English-speaking status in 2020?",
+      "follow_up_question": "How should Lowcountry be defined for this query—specific South Carolina/Georgia coastal counties?"
+    },
+    {
+      "id": 115,
+      "question": "In the Midlands, what is household income in the past 12 months in 2020?",
+      "follow_up_question": "Which Midlands do you mean for this analysis?"
+    },
+    {
+      "id": 116,
+      "question": "For the Inland Empire, what is household income by internet subscription presence/type in 2020?",
+      "follow_up_question": "Should Inland Empire be treated as Riverside and San Bernardino counties?"
+    },
+    {
+      "id": 117,
+      "question": "In the Front Range, what is allocation of household computer type in 2020?",
+      "follow_up_question": "For Front Range, what county boundary should I use?"
+    },
+    {
+      "id": 118,
+      "question": "For the I-95 corridor, compare internet subscriptions in household in 2019.",
+      "follow_up_question": "For the I-95 corridor, what start/end geography should I include?"
+    },
+    {
+      "id": 119,
+      "question": "In the Delta, what is other types of income for households in 2020?",
+      "follow_up_question": "Which Delta are you referring to—Mississippi Delta or Sacramento–San Joaquin Delta?"
+    },
+    {
+      "id": 120,
+      "question": "For the Four Corners area, what is self-employment income for households in 2020?",
+      "follow_up_question": "For Four Corners area, should I include only counties touching the exact point or a broader region?"
+    },
+    {
+      "id": 121,
+      "question": "In the Central Valley, what is aggregate retirement income for households in 2020?",
+      "follow_up_question": "For Central Valley, should I split results into Sacramento Valley and San Joaquin Valley?"
+    },
+    {
+      "id": 122,
+      "question": "For the High Desert, what is aggregate public assistance income for households in 2019?",
+      "follow_up_question": "Which High Desert do you mean—California High Desert, New Mexico, or another?"
+    },
+    {
+      "id": 123,
+      "question": "In the Upstate, what is median household income by age of householder in 2020?",
+      "follow_up_question": "Which Upstate are you referring to—Upstate New York, South Carolina, or another?"
+    },
+    {
+      "id": 124,
+      "question": "For the Ozarks, what is family type by presence/age of related children under 18 in 2020?",
+      "follow_up_question": "For the Ozarks, which counties or states should define your target region?"
+    },
+    {
+      "id": 125,
+      "question": "In coal country, what is aggregate income deficit for families below poverty in 2019?",
+      "follow_up_question": "How do you want coal country defined—ARC coal counties or a custom area?"
+    },
+    {
+      "id": 126,
+      "question": "For the Silicon Slopes, what is labor force status by computer/internet in household in 2020?",
+      "follow_up_question": "For Silicon Slopes, should I use Utah County only or include Salt Lake and Davis counties?"
+    },
+    {
+      "id": 127,
+      "question": "In the Research Triangle, what is sex by industry for civilian employed population 16+ in 2020?",
+      "follow_up_question": "For Research Triangle, can I use Wake, Durham, and Orange counties as the default?"
+    },
+    {
+      "id": 128,
+      "question": "For the Quad Cities, what is allocation of occupation for civilian employed population 16+ in 2019?",
+      "follow_up_question": "For Quad Cities, should I include Scott and Rock Island counties only, or nearby counties too?"
+    },
+    {
+      "id": 129,
+      "question": "In the Twin Ports, what is allocation of class of worker for civilian employed population 16+ in 2020?",
+      "follow_up_question": "For Twin Ports, should I map to St. Louis County, MN and Douglas County, WI?"
+    },
+    {
+      "id": 130,
+      "question": "For the Sun Corridor, compare sex by occupation for civilian employed population 16+ in 2020.",
+      "follow_up_question": "For Sun Corridor, which Arizona counties should be in scope?"
+    },
+    {
+      "id": 131,
+      "question": "In the Bay Area, what is race for population 18+ in redistricting data?",
+      "follow_up_question": "For Bay Area redistricting, do you want the 9-county standard?"
+    },
+    {
+      "id": 132,
+      "question": "For NYC metro, what is Hispanic or Latino vs not Hispanic by race in redistricting?",
+      "follow_up_question": "For NYC metro redistricting, should I include NJ/CT counties or only NYC borough counties?"
+    },
+    {
+      "id": 133,
+      "question": "In Greater LA, what is group quarters population by major type in redistricting?",
+      "follow_up_question": "For Greater LA redistricting, should I include LA, Orange, Riverside, and San Bernardino counties?"
+    },
+    {
+      "id": 134,
+      "question": "For the DMV, what is RACE in redistricting data?",
+      "follow_up_question": "For DMV redistricting, should I return DC only or DC plus selected Maryland and Virginia counties?"
+    },
+    {
+      "id": 135,
+      "question": "In the Bay, what are 2019 patterns related same-month brand trends?",
+      "follow_up_question": "When you say the Bay, do you mean San Francisco Bay, Tampa Bay, or another bay area?"
+    },
+    {
+      "id": 136,
+      "question": "For the City, what are 2019 patterns popularity by day?",
+      "follow_up_question": "Which City are you referring to in this patterns query?"
+    },
+    {
+      "id": 137,
+      "question": "In the Triangle area, summarize 2019 patterns visitor_work_cbgs.",
+      "follow_up_question": "For Triangle area, do you mean North Carolina’s Triangle?"
+    },
+    {
+      "id": 138,
+      "question": "For the Metro East, summarize 2019 patterns visitor_home_cbgs.",
+      "follow_up_question": "For Metro East, should I use the Illinois counties across from St. Louis?"
+    },
+    {
+      "id": 139,
+      "question": "In the Cape, what is 2019 patterns raw_visitor_count?",
+      "follow_up_question": "Which Cape do you mean—Cape Cod, Cape Canaveral, or another?"
+    },
+    {
+      "id": 140,
+      "question": "For the Sound, what is 2019 patterns distance_from_home?",
+      "follow_up_question": "Which Sound do you mean—Puget Sound, Long Island Sound, or another?"
+    }
+  ]
+}

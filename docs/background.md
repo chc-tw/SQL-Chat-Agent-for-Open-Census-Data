@@ -18,12 +18,13 @@ We are working on US Open Census Dataset on snowflake. We want to create a web a
 
 ### Planning and database routing
 - Agent should be able to understand the database structure and use metadata to find the relevant table and columns for the user's question.
-- If the agent needs to retrieve data from multiple tables, it should join them appropriately.
+- Have self-relection ability to check the result of sql execution. rewrite sql or do a second query if necessary
 
 ## UI/UX
 - Left Side showing a collapsible chat history, right side showing conversation with input field
-- Showing current steps of agnet (planning, thinking, tool calling, etc.)
+- Show current steps of agnet (planning, thinking, tool calling, etc.)
 - Use Markdown format for rendering agnet's answer.
+- Show token and time consumption for each response
 
 # Tech Stack Requirements
 
@@ -62,5 +63,3 @@ Below is the tech stack used in this project. If you have better suggestions, pl
 **Development Tools**
 - Docker (local development + Cloud Run deployment)
 - `.env` + `.env.example` (local secret management)
-
-# Dataflow
