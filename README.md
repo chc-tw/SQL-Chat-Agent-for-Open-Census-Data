@@ -44,9 +44,9 @@ The most challenging part is to make agent successfully write the correct SQL, b
 
 ## Future Improvement
 ### Agent
-[] add more knowledges to improve performance
-[] add human-in-loop to clarify user's intention. For example, when use says "New York", agent should ask is it New York city or New York state.
+- [ ] add more agumented knowledges to improve performance
+- [ ] add human-in-loop to clarify user's intention. For example, when use says "New York", agent should ask is it New York city or New York state.
 
 ### Web
-[] enable chat edit
-[] enable terminate response
+- [ ] enable chat edit
+- [ ] enable terminate response
