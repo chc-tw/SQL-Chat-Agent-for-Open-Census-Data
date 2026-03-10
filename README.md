@@ -2,6 +2,10 @@
 
 A full-stack conversational AI agent that answers natural-language questions about the **US Open Census dataset (2019–2020)** stored in Snowflake. Ask questions like *"What is the median household income in San Diego County?"* or *"Which counties in Texas had the highest education rates?"* and get SQL-backed answers streamed back in real time.
 
+<div style="text-align: center;">
+  <img src="docs/imgs/demo.png" alt="Demo" width="50%">
+</div>
+
 ---
 
 ## Features
