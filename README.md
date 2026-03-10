@@ -1,52 +1,120 @@
- # 2026 Snowflake Applied AI Home Work Assignment
- 
-## How to access
+# SQL Chat Agent for Open Census Data
 
-Go to the website [link](https://chc-snowflake-agent.web.app/) and use one of the following accounts to login. Note that different account will have different session and have different chat history records.
+A full-stack conversational AI agent that answers natural-language questions about the **US Open Census dataset (2019–2020)** stored in Snowflake. Ask questions like *"What is the median household income in San Diego County?"* or *"Which counties in Texas had the highest education rates?"* and get SQL-backed answers streamed back in real time.
 
-> Note that initial access might be delayed due to Cloud Run cold starts
+---
 
-| account | password |
-| --- | --- |
-| user1 | password1 |
-| user2 | password2 |
-| user3 | password1 |
-| user4 | password2 |
-| user5 | password1 |
+## Features
 
-## Development Process
-**Timeline**
+- **Natural Language → SQL**: ReAct agent resolves geography, looks up schema metadata, writes and executes Snowflake SQL
+- **Real-time Streaming**: Server-Sent Events stream agent thinking steps, tool calls, and final answers live
+- **Hierarchical RAG**: ChromaDB vector search (OpenAI embeddings) + claude-haiku reranking to identify exact ACS census columns from thousands of options
+- **Guardrails**: Haiku-based content filter blocks off-topic or unsafe queries while allowing follow-up questions with conversation context
+- **Persistent Chat History**: Per-user sessions stored in Firestore; sessions auto-renamed by AI after the first message
+- **Markdown Rendering**: Responses rendered as formatted markdown with tables and code blocks
+- **Agent Observability**: Each response shows token count, wall-clock latency, and a live step-by-step reasoning trace
 
-| time | progress |
-| --- | --- |
-| 0 hr ~ 4 hr | database understanding |
-| 4 hr ~ 10 hr | documents writing |
-| 10 hr ~ 20 hr | code implementation (1st ver) |
-| 20 hr ~ 23 hr | feature updating |
-| 23 hr ~ 26 gr | agent validation and improvement |
-| 26 hr ~ 30 hr | deployment & conclusion |
+---
 
-At first, I invested a lot of time to write documents about project structure, agent design and system design to make sure the process of developement can be stable and I can utilize these docs to guide AI to support me develope the code. (All under the `docs` folder). List of docs:
-1. `docs/background.md`: The main doc about feature and tech stack
-2. `docs/agent_design`: The design of agent
-3. `docs/agent_evaluation.md`: The mechanism of agent validation
-4. `docs/context_management.md`: The mechanism of dynamic context management for knowledge loading.
-5. `docs/database_structure.md`: The explanation docs of database structure.
+## Architecture
 
-### Implementation details
+```
+Browser → POST /api/chat/sessions/{id}/messages
+  → Guardrails check (haiku)
+  → Save user message to Firestore
+  → SSE stream:
+      ReAct loop (sonnet-4-6)
+        └─ search_fips_codes      → Snowflake FIPS metadata
+        └─ search_feature_schema  → ChromaDB + haiku reranking
+        └─ get_field_descriptions → Snowflake schema metadata
+        └─ execute_sql            → Snowflake SELECT
+        └─ fetch_knowledge        → On-demand recovery guides
+      + concurrent task: session auto-rename (haiku)
+```
 
-Instead of using library such as Langchain or CrewAI, I choosed to use native API to build agent engin on my own to have fully controll about its behavior. I initially tried to use Typescript for full-stack development, but I noticed the SDK support of Claude API in typescript is not as good as Python, so I changed the tech stack using Python to build backend. 
+### Three-Tier Context Management
 
-The development process is:
-agent logic -> API Endpoint -> Frontend -> features adding -> agent validation and improvement
+To avoid bloating the system prompt and causing instruction dilution, knowledge is loaded in tiers:
 
-The most challenging part is to make agent successfully write the correct SQL, because it contains the complex metadata mapping and join operation. 
+| Tier | What | When loaded |
+|------|------|-------------|
+| System prompt | Universal reasoning rules | Always |
+| Tool descriptions | Per-tool usage guidance | Every iteration (zero cost) |
+| Knowledge files (`docs/tool_knowledge/`) | Edge-case recovery guides | Only on tool failure |
 
-## Future Improvement
-### Agent
-- [ ] add more agumented knowledges to improve performance
-- [ ] add human-in-loop to clarify user's intention. For example, when use says "New York", agent should ask is it New York city or New York state.
+---
 
-### Web
-- [ ] enable chat edit
-- [ ] enable terminate response
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Agent** | Anthropic Claude (sonnet-4-6 + haiku-4-5), native SDK — no LangChain |
+| **Backend** | Python, FastAPI, `uv`, Pydantic |
+| **Vector Store** | ChromaDB (local), OpenAI `text-embedding-3-large` |
+| **Database** | Snowflake (US Open Census Data) |
+| **Auth / Storage** | JWT, GCP Firestore |
+| **Frontend** | React 19, TypeScript, Vite, Tailwind CSS |
+| **Deployment** | GCP Cloud Run (backend), Firebase Hosting (frontend) |
+| **CI/CD** | GitHub Actions |
+
+---
+
+## Local Setup
+
+### Prerequisites
+
+- Python 3.11+, [`uv`](https://docs.astral.sh/uv/)
+- Node.js 18+, `pnpm`
+- Snowflake account with the [US Open Census Data](https://app.snowflake.com/marketplace/listing/GZSTZ491VXY) marketplace dataset
+- Anthropic API key, OpenAI API key
+- GCP project with Firestore enabled (`gcloud auth application-default login`)
+
+### Backend
+
+```bash
+cd backend
+cp .env.example .env   # fill in your credentials
+uv sync
+uv run python -c "from app.main import app; print('OK')"  # sanity check
+uv run uvicorn app.main:app --reload --port 8080
+```
+
+Populate the ChromaDB vector store (required once before feature search works):
+
+```bash
+make embed_feature_docs
+```
+
+### Frontend
+
+```bash
+cd frontend
+pnpm install
+pnpm dev   # http://localhost:5173
+```
+
+---
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `SNOWFLAKE_ACCOUNT` | Snowflake account identifier |
+| `SNOWFLAKE_USER` | Snowflake username |
+| `SNOWFLAKE_PASSWORD` | Snowflake password |
+| `SNOWFLAKE_WAREHOUSE` | Compute warehouse |
+| `SNOWFLAKE_DATABASE` | Database name |
+| `SNOWFLAKE_SCHEMA` | Schema name |
+| `ANTHROPIC_API_KEY` | For the ReAct agent and guardrails |
+| `OPENAI_API_KEY` | For ChromaDB embeddings |
+| `JWT_SECRET` | JWT signing secret |
+| `USERS` | JSON array: `[{"username":"...","password":"..."}]` |
+| `GCP_PROJECT_ID` | Firestore project ID |
+
+---
+
+## Future Improvements
+
+- [ ] Human-in-the-loop clarification (e.g., "New York" → city or state?)
+- [ ] Augmented knowledge base for more edge-case query types
+- [ ] Enable chat message editing and response termination

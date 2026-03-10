@@ -1,17 +1,3 @@
-"""
-Validation script: randomly picks 3 questions per difficulty level from
-Dataset/testcase.json, sends each question + its follow-up to the local
-API server, and prints live streaming output.
-
-Trace files are written to backend/traces/ automatically by the server.
-
-Usage:
-    uv run python -m app.utils.run_validation
-    uv run python -m app.utils.run_validation --url http://localhost:8080
-    uv run python -m app.utils.run_validation --username chc --password chc419
-    uv run python -m app.utils.run_validation --seed 42   # reproducible selection
-"""
-
 from __future__ import annotations
 
 import argparse
